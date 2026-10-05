@@ -1,0 +1,28 @@
+{
+  "name": "alina-content-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Remotion workflow for short vertical videos (Reels / TikTok / Shorts) for a personal blog",
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio",
+    "sfx": "node scripts/generate-sfx.mjs",
+    "new": "node scripts/new-reel.mjs",
+    "render": "node scripts/render.mjs",
+    "still": "remotion still",
+    "probe": "node scripts/probe-assets.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.533",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.533"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}

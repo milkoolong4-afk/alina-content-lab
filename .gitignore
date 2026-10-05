@@ -1,0 +1,14 @@
+node_modules/
+out/*
+!out/.gitkeep
+.DS_Store
+*.log
+.env
+# Raw footage is heavy: keep it out of git by default.
+# Remove these lines if you want to version a reel's assets.
+public/reels/*/**/*.mp4
+public/reels/*/**/*.mov
+public/reels/*/**/*.MOV
+public/reels/*/**/*.m4a
+public/reels/*/**/*.wav
+public/reels/*/**/*.mp3
