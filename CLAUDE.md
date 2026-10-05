@@ -38,8 +38,14 @@ Music never defines a reel. Default: no music at all.
 6. Check with stills at key frames (`npx remotion still <id> out/x.png --frame=N`),
    then `npm run render -- <id> --draft`, then final `npm run render -- <id>`.
 
-Read `docs/STYLE.md`, `docs/SOUND.md`, `docs/WORKFLOW.md`, `docs/COMPONENTS.md`
-before writing a new reel. If `reference/` contains a visual reference, read
+**`docs/EDITING.md` is the binding editing style guide** (pacing, face, typography,
+memes, interruptions, transitions, sound, pre-render checklist). Follow it for every reel
+and run its checklist before rendering.
+
+Read `docs/EDITING.md`, `docs/STYLE.md`, `docs/SOUND.md`, `docs/WORKFLOW.md`,
+`docs/COMPONENTS.md` before writing a new reel. Editing references and their analysis
+live in `reference/editing/` (`ANALYSIS.md`) — principles only, never copy frames,
+texts, characters, content or design. If `reference/` contains a visual reference, read
 `reference/NOTES.md` — use it for the *principles* of editing and graphic
 language, never copy it literally.
 
