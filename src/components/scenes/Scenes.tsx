@@ -138,8 +138,8 @@ export const MemeSceneView: React.FC<{ scene: MemeScene }> = ({ scene }) => {
       <Camera zooms={scene.zooms} shakes={scene.shakes}>
         <AbsoluteFill style={{ padding: `${safe.top}px ${safe.left}px ${safe.bottom - 80}px`, gap: 44, justifyContent: "center" }}>
           {scene.caption && <KineticText lines={scene.caption.split("\n")} animate="none" size={typeSize.l} align="left" maxWidth={1080 - 2 * safe.left} />}
-          <div style={{ position: "relative", border: `8px solid ${color.ink}`, boxShadow: hardShadow(14, color.orange), aspectRatio: "1 / 1", width: "100%", background: color.black, overflow: "hidden" }}>
-            <MediaFill src={scene.src} trimStart={scene.trimStart} volume={scene.volume} />
+          <div style={{ position: "relative", border: `8px solid ${color.ink}`, boxShadow: hardShadow(14, color.orange), aspectRatio: `${scene.aspect ?? 1}`, width: scene.aspect && scene.aspect < 1 ? "auto" : "100%", height: scene.aspect && scene.aspect < 1 ? 1100 : undefined, alignSelf: "center", background: color.black, overflow: "hidden" }}>
+            <MediaFill src={scene.src} trimStart={scene.trimStart} volume={scene.volume} fit={scene.fit} />
             {scene.top && <div style={{ ...memeCaption, fontSize: typeSize.m, top: 24, left: 24, right: 24 }}>{scene.top}</div>}
             {scene.bottom && <div style={{ ...memeCaption, fontSize: typeSize.m, bottom: 24, left: 24, right: 24 }}>{scene.bottom}</div>}
           </div>
@@ -162,7 +162,7 @@ export const TextSceneView: React.FC<{ scene: TextScene }> = ({ scene }) => {
       <Camera zooms={scene.zooms} shakes={scene.shakes}>
         <AbsoluteFill
           style={{
-            padding: `${safe.top}px ${safe.right - 40}px ${safe.bottom}px ${safe.left}px`,
+            padding: align === "center" ? `${safe.top}px ${safe.right - 40}px ${safe.bottom}px` : `${safe.top}px ${safe.right - 40}px ${safe.bottom}px ${safe.left}px`,
             justifyContent: "center",
             alignItems: align === "center" ? "center" : "flex-start",
             gap: 30,
@@ -183,7 +183,7 @@ export const TextSceneView: React.FC<{ scene: TextScene }> = ({ scene }) => {
             boxFg={onDark ? color.ink : onOrange ? color.orange : color.paper}
             align={align}
             font={scene.font}
-            maxWidth={1080 - safe.left - safe.right + 40}
+            maxWidth={align === "center" ? 1080 - 2 * (safe.right - 40) : 1080 - safe.left - safe.right + 40}
           />
         </AbsoluteFill>
       </Camera>

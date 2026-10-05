@@ -23,7 +23,7 @@
   `freeze: { at, label?, style?: "flash"|"orange"|"mono"|"plain", zoom? }` — стоп-кадр с подписью.
 - **`image`** — фото / скриншот на весь кадр, лёгкий дрейф (`drift: false` — выключить).
 - **`screen`** — запись экрана / скриншот в рамке. `device: "phone"|"laptop"|"none"`, `y`, `scale`, `tilt`. Фон по умолчанию оранжевый.
-- **`meme`** — `layout: "card"` (подпись сверху + карточка, по умолч.) или `"full"`. `caption`, `top`, `bottom`.
+- **`meme`** — `layout: "card"` (подпись сверху + карточка, по умолч.) или `"full"`. `caption`, `top`, `bottom`, `aspect` (пропорции карточки = пропорции мема, чтобы не резать его текст), `fit`.
 - **`text`** — большая типографика. `lines[]`, `animate: "slam"|"words"|"lines"|"type"|"none"`, `kicker`, `font`, `size`, `align`.
 - **`split`** — ожидание/реальность. `a`, `b` (`{ src, label }`), `revealB`, `direction`.
 - **`beat`** — пауза/тишина, почти пустой кадр с маленькой подписью.

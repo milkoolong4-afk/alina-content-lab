@@ -194,6 +194,9 @@ export type MemeScene = SceneBase & {
   layout?: "full" | "card";
   /** Caption above the card (layout "card"). Markup allowed. */
   caption?: string;
+  /** Card aspect ratio width/height (layout "card"). Default: 1. Use the meme's own ratio to avoid cropping its text. */
+  aspect?: number;
+  fit?: MediaFit;
   trimStart?: number;
   volume?: number;
 };
