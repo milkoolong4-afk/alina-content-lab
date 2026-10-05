@@ -67,6 +67,7 @@ language, never copy it literally.
 - `npm run new -- <slug> ["Title"]` — new reel from template
 - `npm run probe -- <slug>` — asset info
 - `npm run render -- <id> [--draft]` — render to `out/`
+- `npm run timings -- <slug>` — voice-over → word timestamps (`audio/vo.words.json`, local whisper.cpp)
 - `npm run sfx [-- --force]` — (re)generate placeholder SFX
 - `npm run typecheck`
 

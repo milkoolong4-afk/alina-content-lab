@@ -16,3 +16,6 @@ public/reels/*/**/*.mp3
 # Inbox: drop anything here, Claude sorts it into public/reels/<slug>/
 inbox/*
 !inbox/.gitkeep
+
+# Local whisper.cpp + models (npm run timings)
+.whisper/
