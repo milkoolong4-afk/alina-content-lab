@@ -152,6 +152,32 @@ const sounds = {
     return softclip(mix(b, lowpass(n, 900), 0, 0.6), 1.6);
   },
 
+  drone: () => {
+    // Low dramatic boom that swells into a rumble: for doubt / failure moments.
+    const L = 3.0;
+    const b = buf(L);
+    const shape = (t) => Math.min(1, t / 0.08) * (t < 2.0 ? 1 : Math.exp(-(t - 2.0) / 0.35));
+    let ph1 = 0, ph2 = 0;
+    for (let i = 0; i < b.length; i++) {
+      const t = i / SR;
+      const f = 44 - 6 * (t / L);
+      ph1 += (2 * Math.PI * f) / SR;
+      ph2 += (2 * Math.PI * f * 1.5) / SR;
+      const beat = 1 + 0.18 * Math.sin(2 * Math.PI * 0.9 * t);
+      b[i] = (Math.sin(ph1) + 0.35 * Math.sin(ph2)) * shape(t) * beat;
+    }
+    const n = buf(L);
+    for (let i = 0; i < n.length; i++) n[i] = noise() * shape(i / SR) * 0.6;
+    mix(b, lowpass(lowpass(n, 160), 160), 0, 0.9);
+    const hit = buf(0.6);
+    for (let i = 0; i < hit.length; i++) {
+      const t = i / SR;
+      hit[i] = Math.sin(2 * Math.PI * (30 + 60 * Math.exp(-t * 14)) * t) * Math.exp(-t * 5);
+    }
+    mix(b, hit, 0, 1);
+    return softclip(b, 1.8);
+  },
+
   bonk: () => {
     const b = buf(0.4);
     mix(b, tone(0.4, (t) => 520 * Math.exp(-t * 6) + 160, { a: 0.001, d: 0.08 }), 0, 1);

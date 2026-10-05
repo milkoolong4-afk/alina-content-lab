@@ -24,6 +24,7 @@ export const SFX = {
   ding: "sfx/ding.wav", // success / "it works"
   tick: "sfx/tick.wav", // tiny tick for counters / list items
   thud: "sfx/thud.wav", // soft drop, text slam
+  drone: "sfx/drone.wav", // low boom → rumble (~3 s): doubt, failure, "ой нет" — once per reel
 } as const;
 
 export type SfxName = keyof typeof SFX;

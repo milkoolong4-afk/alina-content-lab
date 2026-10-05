@@ -11,10 +11,16 @@ export default defineReel({
   look: { grain: true },
   audioCuts: [{ from: 16.0, to: 17.2 }],
   captions: {
+    // mode "words": слова появляются по одному, *ключевое* — крупнее (keyScale).
+    // mode "lines" (по умолчанию): вся строка сразу.
+    mode: "words",
     style: "box",
     lines: [
       { text: "субтитры для *войсовера*", start: 2.2, end: 3.4 },
       { text: "короткими [кусками]", start: 3.4, end: 4.6 },
+      { text: "это субтитры *по слову*", start: 31.9, end: 33.4 },
+      { text: "ключевое слово", start: 33.4, end: 34.2 },
+      { text: "*крупнее*", start: 34.2, end: 34.9 },
     ],
   },
   scenes: [
@@ -157,6 +163,38 @@ export default defineReel({
       duration: 2.8,
       transition: "zoom",
       overlays: [{ type: "counter", text: "ДЕНЬ 47", x: 0.22, y: 0.14 }],
+    },
+    {
+      type: "video",
+      note: "лицо в окне → полный кадр",
+      src: "demo:лицо в окне",
+      duration: 3.0,
+      window: { width: 0.84, aspect: 1.25, y: 0.4, growAt: 1.8, growDuration: 0.25 },
+      overlays: [{ type: "label", text: "14 / окно → полный кадр", y: 0.12, duration: 1.8 }],
+      sfx: [{ at: 1.8, sfx: "thud", volume: 0.6 }],
+    },
+    {
+      type: "video",
+      note: "ч/б с середины сцены",
+      src: "demo:ч/б кадр",
+      duration: 2.4,
+      mono: { from: 0.8 },
+      overlays: [
+        { type: "label", text: "15 / ч/б с 0.8 с", y: 0.12 },
+        { type: "hand", text: "сомнение", x: 0.5, y: 0.75, at: 0.8, color: "orange" },
+      ],
+      sfx: [{ at: 0.8, sfx: "drone", volume: 0.7 }],
+    },
+    {
+      type: "video",
+      note: "цифра-глава",
+      src: "demo:глава",
+      duration: 2.4,
+      overlays: [
+        { type: "chapter", text: "1.", aside: "(и самая _главная_)", x: 0.38, y: 0.32 },
+        { type: "label", text: "16 / chapter", y: 0.88 },
+      ],
+      sfx: [{ at: 0, sfx: "impact", volume: 0.6 }],
     },
   ],
 });

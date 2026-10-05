@@ -12,3 +12,7 @@ public/reels/*/**/*.MOV
 public/reels/*/**/*.m4a
 public/reels/*/**/*.wav
 public/reels/*/**/*.mp3
+
+# Inbox: drop anything here, Claude sorts it into public/reels/<slug>/
+inbox/*
+!inbox/.gitkeep

@@ -40,7 +40,9 @@ Music never defines a reel. Default: no music at all.
 
 **`docs/EDITING.md` is the binding editing style guide** (pacing, face, typography,
 memes, interruptions, transitions, sound, pre-render checklist). Follow it for every reel
-and run its checklist before rendering.
+and run its checklist before rendering. **Editing style is uniform; the narrative format is
+chosen per reel** (voice-over, talking head, text-only, memes/screenshots, or a mix) —
+voice-over + word-by-word captions is one option, never a mandatory default.
 
 Read `docs/EDITING.md`, `docs/STYLE.md`, `docs/SOUND.md`, `docs/WORKFLOW.md`,
 `docs/COMPONENTS.md` before writing a new reel. Editing references and their analysis

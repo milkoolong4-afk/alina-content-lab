@@ -55,14 +55,28 @@ export type CaptionLine = {
   text: string;
   start: number;
   end: number;
+  /**
+   * Word start times (seconds, absolute), one per word of `text` — for mode "words".
+   * Omit to spread words evenly across [start, end] (by word length).
+   * Whisper output can fill this automatically (see src/lib/captions.ts).
+   */
+  words?: number[];
 };
 
 export type CaptionsConfig = {
   lines: CaptionLine[];
-  /** "box": ink text on paper box. "outline": white with ink stroke. */
+  /**
+   * "lines" (default): the whole line appears at once.
+   * "words": words pop in one by one as spoken; the line is a chunk that
+   * replaces the previous one. Key words (*word*) are scaled up.
+   */
+  mode?: "lines" | "words";
+  /** "box": ink text on paper box. "outline": white with ink stroke. "orange": ink on orange. */
   style?: "box" | "outline" | "orange";
   /** Vertical position as fraction of height (0 top … 1 bottom). Default 0.68. */
   y?: number;
+  /** Size multiplier for *key* words in mode "words". Default 2.2. */
+  keyScale?: number;
 };
 
 // ─────────────────────────── Camera / FX ─────────────────────────
@@ -125,6 +139,19 @@ export type Overlay = OverlayBase &
     | { type: "flash"; color?: Colorish }
     | { type: "cursor"; toX?: number; toY?: number; click?: boolean }
     | { type: "progress"; label?: string; from?: number; to?: number; color?: Colorish }
+    | {
+        /** Giant chapter numeral / word ("1.", "2.", "5"), allowed to overlap the frame and bleed off-edge. */
+        type: "chapter";
+        text: string;
+        /** Font size px. Default 760. */
+        size?: number;
+        color?: Colorish;
+        /** "italic" (default) — heavy italic grotesk; "serif" — editorial italic; "outline" — stroke only. */
+        variant?: "italic" | "serif" | "outline";
+        /** Small ironic aside next to the numeral, markup allowed: "(и самая главная)". */
+        aside?: string;
+        opacity?: number;
+      }
   );
 
 // ──────────────────────────── Scenes ─────────────────────────────
@@ -141,6 +168,33 @@ type SceneBase = {
   shakes?: Shake[];
   /** Background colour behind media / text. */
   bg?: Colorish;
+  /**
+   * Black & white. `true` = whole scene; `{ from, to }` = only that part (seconds in scene).
+   * Applies to the scene body; overlays stay in colour.
+   */
+  mono?: boolean | { from?: number; to?: number };
+};
+
+/**
+ * Footage in a framed window on a background (talking head "in a frame").
+ * The window can grow to the full frame at `growAt` — emotion punch-in.
+ */
+export type VideoWindow = {
+  /** Window width as fraction of frame width. Default 0.84. */
+  width?: number;
+  /** Window aspect ratio width/height. Default 1.25 (slightly landscape). */
+  aspect?: number;
+  /** Window centre, 0…1. Default x 0.5, y 0.45. */
+  x?: number;
+  y?: number;
+  /** Seconds (in scene) when the window starts growing to full frame. Omit = never. */
+  growAt?: number;
+  /** Seconds the growth takes. 0 = instant jump. Default 0.25. */
+  growDuration?: number;
+  /** Frame border colour. Default ink. */
+  border?: Colorish;
+  /** Hard shadow colour. Default orange. "none" to disable. */
+  shadow?: Colorish | "none";
 };
 
 export type MediaFit = "cover" | "contain";
@@ -158,6 +212,8 @@ export type VideoScene = SceneBase & {
   focus?: string;
   freeze?: Freeze;
   mirror?: boolean;
+  /** Show the footage in a framed window (see VideoWindow). Background = `bg` (default paper). */
+  window?: VideoWindow;
 };
 
 export type ImageScene = SceneBase & {

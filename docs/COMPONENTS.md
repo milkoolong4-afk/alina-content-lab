@@ -16,11 +16,15 @@
 | `overlays` | графика поверх (ниже) |
 | `sfx` | `[{ at, sfx, volume?, duration? }]` |
 | `bg` | цвет фона: `orange` · `ink` · `paper` · любой CSS |
+| `mono` | ч/б: `true` — вся сцена, `{ from?, to? }` — участок (сек). Оверлеи остаются цветными |
 
 ## Сцены
 
 - **`video`** — реальное видео. `src, trimStart, playbackRate, volume (0), fit, focus ("50% 30%"), mirror, freeze`.
   `freeze: { at, label?, style?: "flash"|"orange"|"mono"|"plain", zoom? }` — стоп-кадр с подписью.
+  `window: { width?, aspect?, x?, y?, growAt?, growDuration?, border?, shadow? }` — видео **в окне**
+  на фоне `bg` (по умолч. бумага); в `growAt` окно вырастает до полного кадра за `growDuration`
+  (0 = мгновенно). Для talking head: окно → полный кадр на кульминации.
 - **`image`** — фото / скриншот на весь кадр, лёгкий дрейф (`drift: false` — выключить).
 - **`screen`** — запись экрана / скриншот в рамке. `device: "phone"|"laptop"|"none"`, `y`, `scale`, `tilt`. Фон по умолчанию оранжевый.
 - **`meme`** — `layout: "card"` (подпись сверху + карточка, по умолч.) или `"full"`. `caption`, `top`, `bottom`, `aspect` (пропорции карточки = пропорции мема, чтобы не резать его текст), `fit`.
@@ -50,8 +54,18 @@
 | `flash` | `color` | вспышка |
 | `cursor` | `x,y → toX,toY, click` | курсор с кликом |
 | `progress` | `label, from, to` | «загрузка мотивации 12%» |
+| `chapter` | `text, size (760), variant: italic\|serif\|outline, aside, color, opacity` | гигантская цифра-глава «1.», вылезает за край и перекрывает кадр; `aside` — ремарка «(и самая главная)» |
 
 Оверлеи на уровне всего рилса (`spec.overlays`) используют абсолютное время.
+
+## Субтитры по слову
+
+- `mode: "words"`: каждая строка `lines[]` — кусок из 1–3 слов; слова появляются по одному,
+  место под ещё не сказанные слова зарезервировано (кусок не прыгает).
+- `*слово*` — ключевое: в `keyScale` раз крупнее (2.2), оранжевое с толстой обводкой, на своей строке.
+- `words: [...]` — время начала каждого слова (сек). Без него слова распределяются по длине.
+- Из транскрипции (Whisper, шаг 2 плана): `linesFromWords(words, { keys, maxWords, gap, offset })`
+  из `src/lib/captions.ts` превращает пословные тайминги в `lines`.
 
 ## Уровень рилса
 
@@ -62,7 +76,11 @@ defineReel({
   voiceover: { src: a("audio/vo.m4a"), volume: 1 },
   music: undefined,                     // по умолчанию музыки нет
   audioCuts: [{ from: 18.2, to: 19.4 }], // тишина (музыка + звук видео)
-  captions: { style: "box" | "outline" | "orange", y: 0.68, lines: [{ text, start, end }] },
+  captions: {
+    mode: "lines" | "words",            // "words" — по слову, *ключевое* крупнее
+    style: "box" | "outline" | "orange", y: 0.68, keyScale: 2.2,
+    lines: [{ text: "пять *дней* назад", start, end, words?: [t1, t2, t3] }],
+  },
   sfx: [...],      // абсолютное время
   overlays: [...], // абсолютное время
   scenes: [...],

@@ -289,6 +289,51 @@ export const OverlayView: React.FC<{ o: Overlay; durationFrames: number }> = ({ 
       return <Flash col={c(o.color, color.white)} />;
     case "cursor":
       return <Cursor x={o.x ?? 0.5} y={o.y ?? 0.5} toX={o.toX} toY={o.toY} click={o.click} dur={durationFrames} />;
+    case "chapter": {
+      const variant = o.variant ?? "italic";
+      const col = c(o.color, color.orange);
+      return (
+        <Positioned x={o.x ?? 0.36} y={o.y ?? 0.3} rotate={o.rotate} enter={o.enter ?? "slam"}>
+          <div style={{ position: "relative", opacity: o.opacity ?? 1 }}>
+            <div
+              style={{
+                fontFamily: variant === "serif" ? font.serif : font.display,
+                fontWeight: 900,
+                fontStyle: "italic",
+                fontSize: o.size ?? 760,
+                lineHeight: 0.8,
+                letterSpacing: "-0.06em",
+                whiteSpace: "nowrap",
+                color: variant === "outline" ? "transparent" : col,
+                WebkitTextStroke: variant === "outline" ? `${Math.max(6, (o.size ?? 760) / 70)}px ${col}` : undefined,
+              }}
+            >
+              {o.text}
+            </div>
+            {o.aside && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: "62%",
+                  bottom: "4%",
+                  whiteSpace: "nowrap",
+                  fontFamily: font.serif,
+                  fontStyle: "italic",
+                  fontWeight: 700,
+                  fontSize: 54,
+                  color: color.ink,
+                  background: color.paper,
+                  padding: "2px 16px 6px",
+                  transform: "rotate(-2deg)",
+                }}
+              >
+                <Markup text={o.aside} />
+              </div>
+            )}
+          </div>
+        </Positioned>
+      );
+    }
     case "progress":
       return (
         <Positioned x={o.x} y={o.y} rotate={o.rotate} enter={o.enter ?? "none"}>

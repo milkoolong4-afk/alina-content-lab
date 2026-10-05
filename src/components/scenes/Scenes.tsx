@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Freeze, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Easing, Freeze, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import type { BeatScene, ImageScene, MemeScene, ScreenScene, SplitScene, TextScene, VideoScene } from "../../spec/types";
 import { c, color, hardShadow, safe, size as typeSize } from "../../theme/tokens";
 import { font } from "../../theme/fonts";
@@ -33,8 +33,8 @@ export const VideoSceneView: React.FC<{ scene: VideoScene }> = ({ scene }) => {
   const freezeZoom = frozen ? interpolate(sinceFreeze, [0, 4], [1, fz?.zoom ?? 1.12], { extrapolateRight: "clamp" }) : 1;
   const filter = frozen && style === "mono" ? "grayscale(1) contrast(1.35)" : frozen && style === "orange" ? "grayscale(1) contrast(1.25) brightness(1.1)" : undefined;
 
-  return (
-    <AbsoluteFill style={{ background: c(scene.bg, color.black) }}>
+  const footage = (
+    <>
       <Camera zooms={scene.zooms} shakes={scene.shakes} extraScale={freezeZoom}>
         <AbsoluteFill style={{ filter }}>
           {fz ? (
@@ -50,6 +50,12 @@ export const VideoSceneView: React.FC<{ scene: VideoScene }> = ({ scene }) => {
       {frozen && (style === "flash" || style === "orange") && sinceFreeze < 5 && (
         <AbsoluteFill style={{ background: color.white, opacity: interpolate(sinceFreeze, [0, 4], [0.9, 0], { extrapolateRight: "clamp" }) }} />
       )}
+    </>
+  );
+
+  return (
+    <AbsoluteFill style={{ background: c(scene.bg, scene.window ? color.paper : color.black) }}>
+      {scene.window ? <WindowFrame win={scene.window}>{footage}</WindowFrame> : footage}
       {frozen && fz?.label && (
         <AbsoluteFill style={{ justifyContent: "flex-end", padding: `${safe.top}px ${safe.right}px ${safe.bottom + 40}px ${safe.left}px` }}>
           <div style={{ alignSelf: "flex-start", background: color.paper, padding: "14px 26px", boxShadow: hardShadow(10, color.orange), transform: "rotate(-2deg)" }}>
@@ -58,6 +64,38 @@ export const VideoSceneView: React.FC<{ scene: VideoScene }> = ({ scene }) => {
         </AbsoluteFill>
       )}
     </AbsoluteFill>
+  );
+};
+
+/**
+ * Footage in a window on the background. Grows to the full frame at `growAt`:
+ * the frame border and shadow melt away as it fills the screen.
+ */
+const WindowFrame: React.FC<{ win: NonNullable<VideoScene["window"]>; children: React.ReactNode }> = ({ win, children }) => {
+  const frame = useCurrentFrame();
+  const { fps, width: W, height: H } = useVideoConfig();
+  const ww = (win.width ?? 0.84) * W;
+  const wh = ww / (win.aspect ?? 1.25);
+  const cx = (win.x ?? 0.5) * W;
+  const cy = (win.y ?? 0.45) * H;
+  let p = 0;
+  if (win.growAt !== undefined) {
+    const start = win.growAt * fps;
+    const dur = Math.max(0, (win.growDuration ?? 0.25) * fps);
+    p = dur === 0 ? (frame >= start ? 1 : 0) : interpolate(frame, [start, start + dur], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.bezier(0.2, 0.9, 0.1, 1) });
+  }
+  const lerp = (a: number, b: number) => a + (b - a) * p;
+  const left = lerp(cx - ww / 2, 0);
+  const top = lerp(cy - wh / 2, 0);
+  const width = lerp(ww, W);
+  const height = lerp(wh, H);
+  const border = lerp(10, 0);
+  const shadowOff = lerp(16, 0);
+  const shadow = win.shadow === "none" ? undefined : `${shadowOff}px ${shadowOff}px 0 ${c(win.shadow, color.orange)}`;
+  return (
+    <div style={{ position: "absolute", left, top, width, height, overflow: "hidden", border: border > 0.5 ? `${border}px solid ${c(win.border, color.ink)}` : undefined, boxShadow: shadow, boxSizing: "border-box" }}>
+      <AbsoluteFill>{children}</AbsoluteFill>
+    </div>
   );
 };
 
