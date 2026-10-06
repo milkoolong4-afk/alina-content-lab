@@ -25,6 +25,12 @@ const useEnter = (kind: EnterKind) => {
       const s = interpolate(frame, [0, 3], [1.9, 1], { extrapolateRight: "clamp" });
       return { transform: `scale(${s})`, opacity: interpolate(frame, [0, 1], [0.6, 1], { extrapolateRight: "clamp" }) };
     }
+    case "drop": {
+      // Dropped onto the page: falls in, small overshoot, settles.
+      const y = interpolate(frame, [0, 4, 6, 8], [-260, 18, -6, 0], { extrapolateRight: "clamp" });
+      const r = interpolate(frame, [0, 4, 8], [-6, 2, 0], { extrapolateRight: "clamp" });
+      return { transform: `translateY(${y}px) rotate(${r}deg)` };
+    }
     case "slide-up": {
       const y = interpolate(frame, [0, 5], [80, 0], { extrapolateRight: "clamp" });
       return { transform: `translateY(${y}px)`, opacity: interpolate(frame, [0, 3], [0, 1], { extrapolateRight: "clamp" }) };
@@ -275,8 +281,20 @@ export const OverlayView: React.FC<{ o: Overlay; durationFrames: number }> = ({ 
       );
     case "sticker":
       return (
-        <Positioned x={o.x} y={o.y} rotate={o.rotate ?? 4} enter={o.enter ?? "pop"}>
-          <Img src={resolveSrc(o.src)} style={{ width: o.w ?? 420, height: o.h, objectFit: "contain", filter: `drop-shadow(8px 8px 0 ${color.ink})` }} />
+        <Positioned x={o.x} y={o.y} rotate={o.rotate ?? (o.frame === "card" ? -2 : 3)} enter={o.enter ?? "pop"}>
+          <Sticker o={o} durationFrames={durationFrames} />
+        </Positioned>
+      );
+    case "loading":
+      return (
+        <Positioned x={o.x} y={o.y} rotate={o.rotate} enter={o.enter ?? "none"}>
+          <Loading variant={o.variant ?? "dots"} label={o.label} col={c(o.color, color.ink)} size={o.size ?? 1} />
+        </Positioned>
+      );
+    case "check":
+      return (
+        <Positioned x={o.x} y={o.y} rotate={o.rotate ?? -4} enter={o.enter ?? "pop"}>
+          <Check size={o.size ?? 200} col={c(o.color, color.ok)} />
         </Positioned>
       );
     case "emoji":
@@ -341,6 +359,85 @@ export const OverlayView: React.FC<{ o: Overlay; durationFrames: number }> = ({ 
         </Positioned>
       );
   }
+};
+
+type StickerO = Extract<Overlay, { type: "sticker" }>;
+
+/** Paper cut-out / screenshot card with optional slow zoom and hand-placed wobble. */
+const Sticker: React.FC<{ o: StickerO; durationFrames: number }> = ({ o, durationFrames }) => {
+  const frame = useCurrentFrame();
+  const zoom = o.zoomTo ? interpolate(frame, [0, durationFrames], [1, o.zoomTo], { extrapolateRight: "clamp" }) : 1;
+  const bob = o.float ? Math.sin(frame / 9) * 6 : 0;
+  const tilt = o.float ? Math.sin(frame / 13) * 1.2 : 0;
+  const shadowCol = o.shadow === false ? null : c(typeof o.shadow === "string" ? o.shadow : undefined, color.ink);
+  const card = o.frame === "card";
+  const img = (
+    <Img
+      src={resolveSrc(o.src)}
+      style={{
+        width: o.w ?? 420,
+        height: o.h,
+        objectFit: card ? "cover" : "contain",
+        objectPosition: "50% 0%",
+        display: "block",
+        transform: o.flip ? "scaleX(-1)" : undefined,
+        filter: !card && shadowCol ? `drop-shadow(10px 12px 0 ${shadowCol})` : undefined,
+      }}
+    />
+  );
+  return (
+    <div style={{ transform: `translateY(${bob}px) rotate(${tilt}deg) scale(${zoom})` }}>
+      {card ? <div style={{ background: color.paper, padding: 14, boxShadow: shadowCol ? hardShadow(14, shadowCol) : undefined, border: `4px solid ${color.ink}` }}>{img}</div> : img}
+    </div>
+  );
+};
+
+/** Indeterminate loading: dots / spinner / bar. Loops forever — that's the joke. */
+const Loading: React.FC<{ variant: "dots" | "spinner" | "bar"; label?: string; col: string; size: number }> = ({ variant, label, col, size }) => {
+  const frame = useCurrentFrame();
+  const labelEl = label ? <div style={{ fontFamily: font.mono, fontWeight: 700, fontSize: 40 * size, color: col, marginTop: 18 * size, textAlign: "center" }}>{label}</div> : null;
+  if (variant === "spinner") {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ width: 110 * size, height: 110 * size, borderRadius: "50%", border: `${14 * size}px solid ${col}33`, borderTopColor: col, transform: `rotate(${frame * 14}deg)` }} />
+        {labelEl}
+      </div>
+    );
+  }
+  if (variant === "bar") {
+    const x = ((frame * 2.4) % 140) - 40;
+    return (
+      <div style={{ width: 560 * size }}>
+        <div style={{ height: 34 * size, border: `${5 * size}px solid ${col}`, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, bottom: 0, left: `${x}%`, width: "40%", background: col }} />
+        </div>
+        {labelEl}
+      </div>
+    );
+  }
+  const active = Math.floor(frame / 7) % 4; // 0..3 dots
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 22 * size }}>
+        {[0, 1, 2].map((i) => (
+          <div key={i} style={{ width: 30 * size, height: 30 * size, borderRadius: "50%", background: col, opacity: i < active ? 1 : 0.2 }} />
+        ))}
+      </div>
+      {labelEl}
+    </div>
+  );
+};
+
+/** Hand-drawn check mark, drawn in over ~8 frames. */
+const Check: React.FC<{ size: number; col: string }> = ({ size, col }) => {
+  const p = useDraw(8);
+  const len = 140;
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="44" fill={col} stroke={color.ink} strokeWidth="5" />
+      <polyline points="27,52 43,68 74,34" fill="none" stroke={color.white} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" strokeDasharray={len} strokeDashoffset={len * (1 - p)} />
+    </svg>
+  );
 };
 
 const HighlightBar: React.FC<{ w: number; h: number; col: string }> = ({ w, h, col }) => {

@@ -34,7 +34,7 @@
 
 ## Оверлеи (`overlays`)
 
-Общие: `at`, `duration` (по умолч. до конца сцены), `x`, `y` (0…1, центр элемента), `rotate`, `enter: "pop"|"slam"|"slide-up"|"none"|"type"`.
+Общие: `at`, `duration` (по умолч. до конца сцены), `x`, `y` (0…1, центр элемента), `rotate`, `enter: "pop"|"slam"|"slide-up"|"drop"|"none"|"type"` (`drop` — вырезку «бросили» на страницу).
 
 | type | Поля | Для чего |
 |---|---|---|
@@ -49,7 +49,9 @@
 | `counter` | `text` | «ДЕНЬ 47», «попытка №12» |
 | `notification` | `app, title, body, time` | пуш-уведомление |
 | `error` | `title, body, buttons` | окно ошибки |
-| `sticker` | `src, w, h` | PNG-стикер (вырезанное лицо, объект) |
+| `sticker` | `src, w, h, shadow, frame: "card", flip, zoomTo, float` | PNG-вырезка (я, предметы из `public/stickers/`) с жёсткой тенью; `frame: "card"` — скриншот карточкой; `zoomTo` — медленный зум; `float` — лёгкое «покачивание» |
+| `loading` | `variant: dots\|spinner\|bar, label, color, size` | бесконечная загрузка — deadpan-шутка |
+| `check` | `size, color` | рисованная галочка в круге — «работает» |
 | `emoji` | `char, size` | один эмодзи, крупно |
 | `flash` | `color` | вспышка |
 | `cursor` | `x,y → toX,toY, click` | курсор с кликом |
@@ -74,6 +76,8 @@ defineReel({
   id: "slug",
   look: { grain: true, guides: false },
   voiceover: { src: a("audio/vo.m4a"), volume: 1 },
+  // или кусками одного файла — чтобы удлинить паузу, не трогая голос:
+  // voiceover: [{ src, at: 0, trimStart: 2.6, duration: 17.6 }, { src, at: 18.0, trimStart: 20.2 }],
   music: undefined,                     // по умолчанию музыки нет
   audioCuts: [{ from: 18.2, to: 19.4 }], // тишина (музыка + звук видео)
   captions: {
@@ -86,6 +90,11 @@ defineReel({
   scenes: [...],
 });
 ```
+
+## Сцена-коллаж
+
+`beat` без текста = чистый фон (`bg`), на который выкладываются оверлеи: стикеры, заголовки,
+стрелки, карточки скриншотов. Так собраны хук и финал `day-25`.
 
 ## Добавить новый компонент
 

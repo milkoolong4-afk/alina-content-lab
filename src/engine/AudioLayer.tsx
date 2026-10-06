@@ -11,7 +11,7 @@ const Track: React.FC<{ track: AudioTrack; kind: CutTrack; cuts: AudioCut[]; def
   const at = Math.round((track.at ?? 0) * fps);
   const vol = track.volume ?? defaultVolume;
   return (
-    <Sequence from={at} name={kind} layout="none">
+    <Sequence from={at} durationInFrames={track.duration ? Math.max(1, Math.round(track.duration * fps)) : undefined} name={kind} layout="none">
       <Audio
         src={resolveSrc(track.src)}
         trimBefore={track.trimStart ? Math.round(track.trimStart * fps) : undefined}
@@ -36,7 +36,9 @@ export const AudioLayer: React.FC<{ spec: ReelSpec; slots: SceneSlot[] }> = ({ s
 
   return (
     <>
-      {spec.voiceover && <Track track={spec.voiceover} kind="voiceover" cuts={cuts} defaultVolume={1} />}
+      {(Array.isArray(spec.voiceover) ? spec.voiceover : spec.voiceover ? [spec.voiceover] : []).map((vo, i) => (
+        <Track key={`vo${i}`} track={vo} kind="voiceover" cuts={cuts} defaultVolume={1} />
+      ))}
       {spec.music && <Track track={spec.music} kind="music" cuts={cuts} defaultVolume={0.12} />}
       {cues.map((cue, i) => (
         <Sequence

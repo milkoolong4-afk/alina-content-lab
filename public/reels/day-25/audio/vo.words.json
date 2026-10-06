@@ -1,0 +1,317 @@
+[
+ {
+  "text": "двадцать",
+  "startMs": 2880,
+  "endMs": 3320
+ },
+ {
+  "text": "пять",
+  "startMs": 3320,
+  "endMs": 3560
+ },
+ {
+  "text": "дней",
+  "startMs": 3600,
+  "endMs": 3840
+ },
+ {
+  "text": "назад",
+  "startMs": 3880,
+  "endMs": 4200
+ },
+ {
+  "text": "я",
+  "startMs": 4240,
+  "endMs": 4320
+ },
+ {
+  "text": "начала",
+  "startMs": 4360,
+  "endMs": 4760
+ },
+ {
+  "text": "делать",
+  "startMs": 4760,
+  "endMs": 5080
+ },
+ {
+  "text": "приложение",
+  "startMs": 5160,
+  "endMs": 5840
+ },
+ {
+  "text": "я",
+  "startMs": 6440,
+  "endMs": 6520
+ },
+ {
+  "text": "вообще",
+  "startMs": 6600,
+  "endMs": 6920
+ },
+ {
+  "text": "не",
+  "startMs": 6920,
+  "endMs": 7080
+ },
+ {
+  "text": "программист",
+  "startMs": 7120,
+  "endMs": 7720
+ },
+ {
+  "text": "я",
+  "startMs": 7840,
+  "endMs": 7920
+ },
+ {
+  "text": "просто",
+  "startMs": 7960,
+  "endMs": 8240
+ },
+ {
+  "text": "решила",
+  "startMs": 8240,
+  "endMs": 8640
+ },
+ {
+  "text": "проверить",
+  "startMs": 8680,
+  "endMs": 9160
+ },
+ {
+  "text": "смогу",
+  "startMs": 9280,
+  "endMs": 9560
+ },
+ {
+  "text": "ли",
+  "startMs": 9600,
+  "endMs": 9760
+ },
+ {
+  "text": "я",
+  "startMs": 9800,
+  "endMs": 9880
+ },
+ {
+  "text": "собрать",
+  "startMs": 9920,
+  "endMs": 10360
+ },
+ {
+  "text": "его",
+  "startMs": 10440,
+  "endMs": 10640
+ },
+ {
+  "text": "с",
+  "startMs": 10680,
+  "endMs": 10760
+ },
+ {
+  "text": "помощью",
+  "startMs": 10800,
+  "endMs": 11160
+ },
+ {
+  "text": "Claude",
+  "startMs": 11200,
+  "endMs": 11560
+ },
+ {
+  "text": "за",
+  "startMs": 12200,
+  "endMs": 12360
+ },
+ {
+  "text": "эти",
+  "startMs": 12440,
+  "endMs": 12640
+ },
+ {
+  "text": "дни",
+  "startMs": 12680,
+  "endMs": 12880
+ },
+ {
+  "text": "я",
+  "startMs": 12920,
+  "endMs": 13000
+ },
+ {
+  "text": "узнала",
+  "startMs": 13080,
+  "endMs": 13440
+ },
+ {
+  "text": "что",
+  "startMs": 13480,
+  "endMs": 13640
+ },
+ {
+  "text": "такое",
+  "startMs": 13640,
+  "endMs": 13880
+ },
+ {
+  "text": "GitHub",
+  "startMs": 13880,
+  "endMs": 14520
+ },
+ {
+  "text": "репозиторий",
+  "startMs": 14600,
+  "endMs": 15520
+ },
+ {
+  "text": "баги",
+  "startMs": 15600,
+  "endMs": 16000
+ },
+ {
+  "text": "тестирование",
+  "startMs": 16080,
+  "endMs": 16960
+ },
+ {
+  "text": "и",
+  "startMs": 17240,
+  "endMs": 17320
+ },
+ {
+  "text": "ещё",
+  "startMs": 17440,
+  "endMs": 17640
+ },
+ {
+  "text": "миллион",
+  "startMs": 17680,
+  "endMs": 18080
+ },
+ {
+  "text": "вещей",
+  "startMs": 18120,
+  "endMs": 18400
+ },
+ {
+  "text": "о",
+  "startMs": 18400,
+  "endMs": 18480
+ },
+ {
+  "text": "которых",
+  "startMs": 18520,
+  "endMs": 18880
+ },
+ {
+  "text": "раньше",
+  "startMs": 18920,
+  "endMs": 19240
+ },
+ {
+  "text": "не",
+  "startMs": 19320,
+  "endMs": 19440
+ },
+ {
+  "text": "слышала",
+  "startMs": 19480,
+  "endMs": 20000
+ },
+ {
+  "text": "приложение",
+  "startMs": 20520,
+  "endMs": 21120
+ },
+ {
+  "text": "всё",
+  "startMs": 21160,
+  "endMs": 21320
+ },
+ {
+  "text": "ещё",
+  "startMs": 21360,
+  "endMs": 21560
+ },
+ {
+  "text": "не",
+  "startMs": 21560,
+  "endMs": 21720
+ },
+ {
+  "text": "готово",
+  "startMs": 21720,
+  "endMs": 22080
+ },
+ {
+  "text": "но",
+  "startMs": 22120,
+  "endMs": 22240
+ },
+ {
+  "text": "оно",
+  "startMs": 22280,
+  "endMs": 22480
+ },
+ {
+  "text": "уже",
+  "startMs": 22520,
+  "endMs": 22720
+ },
+ {
+  "text": "работает",
+  "startMs": 22800,
+  "endMs": 23320
+ },
+ {
+  "text": "и",
+  "startMs": 23720,
+  "endMs": 23800
+ },
+ {
+  "text": "теперь",
+  "startMs": 23880,
+  "endMs": 24280
+ },
+ {
+  "text": "мне",
+  "startMs": 24560,
+  "endMs": 24760
+ },
+ {
+  "text": "почему",
+  "startMs": 24800,
+  "endMs": 25200
+ },
+ {
+  "text": "то",
+  "startMs": 25200,
+  "endMs": 25320
+ },
+ {
+  "text": "очень",
+  "startMs": 25400,
+  "endMs": 25720
+ },
+ {
+  "text": "интересно",
+  "startMs": 25760,
+  "endMs": 26280
+ },
+ {
+  "text": "чем",
+  "startMs": 26800,
+  "endMs": 27040
+ },
+ {
+  "text": "это",
+  "startMs": 27120,
+  "endMs": 27320
+ },
+ {
+  "text": "закончится",
+  "startMs": 27360,
+  "endMs": 28040
+ }
+]

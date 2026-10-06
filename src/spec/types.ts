@@ -35,6 +35,8 @@ export type AudioTrack = {
   at?: number;
   /** Skip the first N seconds of the file. */
   trimStart?: number;
+  /** Play only N seconds of the file (after trimStart). Omit = to the end. */
+  duration?: number;
 };
 
 /**
@@ -118,7 +120,7 @@ type OverlayBase = {
   y?: number;
   rotate?: number;
   /** Entrance animation. Default depends on overlay. */
-  enter?: "pop" | "slam" | "none" | "slide-up" | "type";
+  enter?: "pop" | "slam" | "none" | "slide-up" | "drop" | "type";
 };
 
 export type Overlay = OverlayBase &
@@ -134,7 +136,36 @@ export type Overlay = OverlayBase &
     | { type: "counter"; text: string; color?: Colorish; bg?: Colorish }
     | { type: "notification"; app?: string; title: string; body?: string; time?: string }
     | { type: "error"; title?: string; body: string; buttons?: string[] }
-    | { type: "sticker"; src: string; w?: number; h?: number }
+    | {
+        /** PNG cut-out (me, objects) or a screenshot. Feels like a physical paper cut-out. */
+        type: "sticker";
+        src: string;
+        w?: number;
+        h?: number;
+        /** Hard drop shadow under the cut-out. Default ink; false = none. */
+        shadow?: boolean | Colorish;
+        /** "card": paper border + hard shadow — for screenshots. */
+        frame?: "none" | "card";
+        flip?: boolean;
+        /** Slowly scale to this value over the overlay's duration (e.g. 1.08). */
+        zoomTo?: number;
+        /** Gentle hand-placed wobble (tiny bob + rotation). */
+        float?: boolean;
+      }
+    | {
+        /** Loading indicator: "dots" (…), "spinner" or "bar" (indeterminate). */
+        type: "loading";
+        variant?: "dots" | "spinner" | "bar";
+        label?: string;
+        color?: Colorish;
+        size?: number;
+      }
+    | {
+        /** Hand-drawn check mark in a circle — the "it works" moment. */
+        type: "check";
+        size?: number;
+        color?: Colorish;
+      }
     | { type: "emoji"; char: string; size?: number }
     | { type: "flash"; color?: Colorish }
     | { type: "cursor"; toX?: number; toY?: number; click?: boolean }
@@ -301,7 +332,11 @@ export type ReelSpec = {
     /** Show safe-zone guides (only for checking, never for export). */
     guides?: boolean;
   };
-  voiceover?: AudioTrack;
+  /**
+   * Voice-over. An array = the same file in pieces, e.g. to stretch a pause
+   * without touching the voice: [{ trimStart: 2.6, duration: 15 }, { at: 15.4, trimStart: 17.6 }].
+   */
+  voiceover?: AudioTrack | AudioTrack[];
   /** Optional, low priority. Never the backbone of a reel. Default volume 0.12. */
   music?: AudioTrack;
   audioCuts?: AudioCut[];
