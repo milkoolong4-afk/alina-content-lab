@@ -9,7 +9,12 @@ in `src/reels/<slug>/reel.ts`) rendered by one engine (`src/engine/Reel.tsx`).
 - **This project is NOT Kedice's visual system.** Never pull Kedice colours,
   fonts, characters, components, sound design or visual decisions. Kedice may
   appear only *as a product inside the story* (her screen recordings as-is).
-- Use only the tokens in `src/theme/tokens.ts` and fonts in `src/theme/fonts.ts`.
+- **Visual style v1 (orange `#FF5A1F` / navy ink / heavy grotesk / dark meme look) is ARCHIVED**
+  (`docs/_archive/STYLE-v1-orange.md`, git tag `style-v1-orange`). Do not use it as the
+  direction for new reels. Style v2 is being defined from the three editing references
+  (`reference/editing/ref-a|b|c`) — see `docs/STYLE.md`. Until v2 is approved, propose
+  style probes instead of applying a look on your own.
+- Use only the tokens in `src/theme/` and fonts in `src/theme/fonts.ts` (they will switch to v2).
 - The main character is Alina, but this is **not a talking-head blog**: face in
   doses; lean on her real footage, work shots, laptop/phone, screen recordings,
   screenshots, photos, memes, big typography, visual jokes.
@@ -47,9 +52,8 @@ voice-over + word-by-word captions is one option, never a mandatory default.
 Read `docs/EDITING.md`, `docs/STYLE.md`, `docs/SOUND.md`, `docs/WORKFLOW.md`,
 `docs/COMPONENTS.md` before writing a new reel. Editing references and their analysis
 live in `reference/editing/` (`ANALYSIS.md`) — principles only, never copy frames,
-texts, characters, content or design. If `reference/` contains a visual reference, read
-`reference/NOTES.md` — use it for the *principles* of editing and graphic
-language, never copy it literally.
+texts, characters, content or design. `reference/_archive/` holds retired references
+(the orange carousel) — not a direction anymore.
 
 ## Editing defaults
 

@@ -54,7 +54,7 @@ scripts/        new-reel · render · probe-assets · generate-sfx
 
 ## Документация
 
-- [docs/STYLE.md](docs/STYLE.md) — визуальный язык, монтаж, чего избегать
+- [docs/STYLE.md](docs/STYLE.md) — визуальный стиль (v2 в поиске; v1 в `docs/_archive/`)
 - [docs/SOUND.md](docs/SOUND.md) — sound design и библиотека звуков
 - [docs/WORKFLOW.md](docs/WORKFLOW.md) — что присылать и как из этого получается рилс
 - [docs/COMPONENTS.md](docs/COMPONENTS.md) — справочник всех сцен и оверлеев
