@@ -10,7 +10,7 @@ in `src/reels/<slug>/reel.ts`) rendered by one engine (`src/engine/Reel.tsx`).
   fonts, characters, components, sound design or visual decisions. Kedice may
   appear only *as a product inside the story* (her screen recordings as-is).
 - **Visual style v1 (orange `#FF5A1F` / navy ink / heavy grotesk / dark meme look) is ARCHIVED**
-  (`docs/_archive/STYLE-v1-orange.md`, git tag `style-v1-orange`). Do not use it as the
+  (`docs/_archive/STYLE-v1-orange.md`, commit `7d79175` (last v1 state)). Do not use it as the
   direction for new reels. Style v2 is being defined from the three editing references
   (`reference/editing/ref-a|b|c`) — see `docs/STYLE.md`. Until v2 is approved, propose
   style probes instead of applying a look on your own.
