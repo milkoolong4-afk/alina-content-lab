@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru" data-theme="light">
+<html lang="ru" data-skin="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -17,7 +17,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
 <style>
 /* ============ ТЕМЫ ============ */
-:root, [data-theme="light"] {
+:root, [data-skin="light"] {
   --page: #EDE4F5;
   --bg: #F7F2FB;
   --ink: #2B2340;
@@ -40,7 +40,7 @@
   --cat-kedice: #EC8FAE; --cat-embroidery: #C68CE2; --cat-travel: #6EB3EA;
   --cat-content: #F2A469; --cat-lila: #8F7BEF; --cat-personal: #77C7A2; --cat-ideas: #E7C35E;
 }
-[data-theme="dark"] {
+[data-skin="dark"] {
   --page: #0E110C;
   --bg: #161B13;
   --ink: #ECE5D1;
@@ -409,10 +409,10 @@ h1.title { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size
 .sheet-wrap { position: absolute; inset: 0; z-index: 80; pointer-events: none; visibility: hidden; transition: visibility 0s .45s; }
 .sheet-wrap.open { visibility: visible; transition: none; }
 .sheet-wrap .backdrop { position: absolute; inset: 0; background: rgba(30,20,45,.28); opacity: 0; transition: opacity .3s; }
-[data-theme="dark"] .sheet-wrap .backdrop { background: rgba(0,0,0,.5); }
+[data-skin="dark"] .sheet-wrap .backdrop { background: rgba(0,0,0,.5); }
 .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; border-radius: 32px 32px 0 0; padding: 10px 20px calc(24px + var(--bottom)); background: var(--glass-strong); -webkit-backdrop-filter: blur(30px) saturate(150%); backdrop-filter: blur(30px) saturate(150%); border-top: 1px solid var(--stroke); transform: translateY(105%); transition: transform .42s cubic-bezier(.2,.8,.2,1); scrollbar-width: none; }
-[data-theme="light"] .sheet { background: rgba(250,246,253,.9); }
-[data-theme="dark"] .sheet { background: rgba(30,35,25,.94); }
+[data-skin="light"] .sheet { background: rgba(250,246,253,.9); }
+[data-skin="dark"] .sheet { background: rgba(30,35,25,.94); }
 .sheet-wrap.open { pointer-events: auto; }
 .sheet-wrap.open .backdrop { opacity: 1; }
 .sheet-wrap.open .sheet { transform: none; }
@@ -1193,6 +1193,7 @@ function analyze(text) {
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null;
 function micProblem(e) {
+  if (window.top !== window) return 'Здесь, внутри claude.ai, браузер не даёт странице микрофон. Посмотри, как всё работает, в демо-записи, а настоящую запись открой по своей ссылке.';
   if (location.protocol === 'file:') return 'Браузер не даёт микрофон странице, открытой из файла. Открой Lila по ссылке https:// или через локальный сервер.';
   if (!window.isSecureContext) return 'Микрофон работает только по защищённой ссылке https://.';
   if (!navigator.mediaDevices || !window.MediaRecorder) return 'Этот браузер не умеет записывать звук. Попробуй Safari или Chrome.';
@@ -1607,7 +1608,7 @@ function settingsHtml(confirmReset) {
   <p class="meta" style="text-align:center;margin-top:18px">Lila · кликабельный прототип</p>`;
 }
 function applyTheme() {
-  document.documentElement.dataset.theme = st.theme;
+  document.documentElement.dataset.skin = st.theme;
   $('meta[name="theme-color"]').content = st.theme === 'dark' ? '#161B13' : '#F7F2FB';
 }
 
