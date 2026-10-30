@@ -1,0 +1,1386 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F2FB">
+<title>Lila</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
+<style>
+/* ============ ТЕМЫ ============ */
+:root, [data-theme="light"] {
+  --page: #EDE4F5;
+  --bg: #F7F2FB;
+  --ink: #2B2340;
+  --ink2: rgba(43,35,64,.64);
+  --ink3: rgba(43,35,64,.38);
+  --line: rgba(43,35,64,.08);
+  --accent: #7356E0;
+  --accent2: #9B84F0;
+  --accent-soft: rgba(115,86,224,.12);
+  --on-accent: #fff;
+  --glass: rgba(255,255,255,.52);
+  --glass-strong: rgba(255,255,255,.78);
+  --stroke: rgba(255,255,255,.85);
+  --shadow: 0 12px 34px rgba(91,63,140,.12), 0 2px 6px rgba(91,63,140,.05);
+  --blob1: #F7B3D2; --blob2: #C8B4F6; --blob3: #B3D7F6;
+  --o1: #F6A6CC; --o2: #B095F4; --o3: #98CBF5; --o4: #F1E6FD;
+  --orb-glow: rgba(176,149,244,.5);
+  --gloss: .95;
+  --danger: #D2557A;
+  --cat-kedice: #EC8FAE; --cat-embroidery: #C68CE2; --cat-travel: #6EB3EA;
+  --cat-content: #F2A469; --cat-lila: #8F7BEF; --cat-personal: #77C7A2; --cat-ideas: #E7C35E;
+}
+[data-theme="dark"] {
+  --page: #0E110C;
+  --bg: #161B13;
+  --ink: #ECE5D1;
+  --ink2: rgba(236,229,209,.66);
+  --ink3: rgba(236,229,209,.4);
+  --line: rgba(236,229,209,.09);
+  --accent: #B3BF78;
+  --accent2: #8E9E58;
+  --accent-soft: rgba(179,191,120,.14);
+  --on-accent: #1A1F14;
+  --glass: rgba(46,52,36,.46);
+  --glass-strong: rgba(56,62,44,.78);
+  --stroke: rgba(236,229,209,.1);
+  --shadow: 0 14px 36px rgba(0,0,0,.38), 0 2px 6px rgba(0,0,0,.2);
+  --blob1: #5B4A2C; --blob2: #3F5530; --blob3: #2B4438;
+  --o1: #C9A464; --o2: #7F904A; --o3: #5D7E6C; --o4: #3B4130;
+  --orb-glow: rgba(170,160,90,.32);
+  --gloss: .55;
+  --danger: #D98A6E;
+  --cat-kedice: #CF8C74; --cat-embroidery: #B79AC4; --cat-travel: #7EA9B8;
+  --cat-content: #D4A45E; --cat-lila: #A7B86C; --cat-personal: #8DB389; --cat-ideas: #CDBB82;
+}
+
+/* ============ БАЗА ============ */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.45;
+  background: var(--page); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  transition: background-color .5s;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input { font: inherit; color: inherit; }
+.serif { font-family: "Cormorant Garamond", Georgia, serif; }
+svg { display: block; }
+.ico { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ico.sm { width: 18px; height: 18px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ============ УСТРОЙСТВО ============ */
+.device {
+  --top: calc(env(safe-area-inset-top) + 14px);
+  --bottom: env(safe-area-inset-bottom);
+  position: relative; width: 100vw; height: 100dvh; overflow: hidden; overflow: clip;
+  background: var(--bg); color: var(--ink);
+  transition: background-color .5s, color .5s;
+  isolation: isolate;
+}
+.statusbar { display: none; }
+@media (min-width: 600px) and (min-height: 560px) {
+  body {
+    background:
+      radial-gradient(60vmax 60vmax at 15% 20%, color-mix(in srgb, var(--blob1) 45%, transparent), transparent 60%),
+      radial-gradient(60vmax 60vmax at 85% 80%, color-mix(in srgb, var(--blob3) 45%, transparent), transparent 60%),
+      var(--page);
+  }
+  .device {
+    --top: 58px; --bottom: 8px;
+    width: 390px; height: 844px; border-radius: 54px; flex: none;
+    box-shadow: 0 0 0 11px #15111c, 0 0 0 12px #3a3346, 0 50px 100px rgba(30,20,50,.35);
+    transform-origin: center center;
+  }
+  .statusbar {
+    display: flex; position: absolute; z-index: 100; top: 0; left: 0; right: 0; height: 50px;
+    align-items: center; justify-content: space-between; padding: 6px 30px 0 40px;
+    font-weight: 600; font-size: 15px; pointer-events: none;
+    background: linear-gradient(var(--bg) 55%, transparent); transition: background .5s;
+  }
+  .statusbar .island { position: absolute; left: 50%; top: 11px; width: 122px; height: 35px; margin-left: -61px; border-radius: 20px; background: #0b0910; }
+  .statusbar .sys { display: flex; gap: 6px; align-items: center; }
+}
+
+/* фоновые пятна */
+.bg { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.bg i { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .75; transition: background-color .6s; }
+.bg i:nth-child(1) { width: 320px; height: 320px; background: var(--blob1); top: -90px; left: -110px; animation: drift1 22s ease-in-out infinite alternate; }
+.bg i:nth-child(2) { width: 300px; height: 300px; background: var(--blob2); top: 300px; right: -140px; animation: drift2 26s ease-in-out infinite alternate; }
+.bg i:nth-child(3) { width: 280px; height: 280px; background: var(--blob3); bottom: -100px; left: -60px; animation: drift3 24s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translate(70px, 60px) scale(1.15); } }
+@keyframes drift2 { to { transform: translate(-60px, -80px) scale(.9); } }
+@keyframes drift3 { to { transform: translate(90px, -40px) scale(1.1); } }
+
+/* ============ ЭКРАН ============ */
+.screen {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+  padding: var(--top) 20px calc(120px + var(--bottom));
+  scrollbar-width: none; overscroll-behavior: contain;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.enter > * { animation: rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.screen.enter > *:nth-child(2) { animation-delay: .05s; }
+.screen.enter > *:nth-child(3) { animation-delay: .1s; }
+.screen.enter > *:nth-child(4) { animation-delay: .15s; }
+.screen.enter > *:nth-child(5) { animation-delay: .2s; }
+.screen.enter > *:nth-child(6) { animation-delay: .25s; }
+.screen.enter > *:nth-child(7) { animation-delay: .3s; }
+.screen.enter > *:nth-child(n+8) { animation-delay: .35s; }
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; margin-bottom: 14px; }
+.topbar .right { display: flex; gap: 8px; }
+.brand { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 26px; font-weight: 500; letter-spacing: .01em; display: flex; align-items: center; gap: 8px; }
+.brand .dot { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff 0 12%, transparent 30%), radial-gradient(circle at 70% 70%, var(--o3), transparent 60%), radial-gradient(circle at 25% 70%, var(--o1), transparent 60%), var(--o2); box-shadow: 0 2px 10px var(--orb-glow); }
+
+.glass {
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(140%); backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+}
+.card { border-radius: 26px; padding: 18px; margin-bottom: 14px; position: relative; transition: background-color .5s, border-color .5s; }
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  transition: transform .15s;
+}
+.pill { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 500; }
+.press { transition: transform .15s ease, opacity .15s; }
+.press:active, .icon-btn:active, .btn:active, .chip-btn:active, .task:active, .navbtn:active { transform: scale(.95); }
+
+h1.title { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 44px; line-height: 1; margin: 6px 0 6px; letter-spacing: -.01em; }
+.sub { color: var(--ink2); font-size: 14px; margin: 0 0 18px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink3); font-weight: 600; margin: 0 0 10px; }
+.section-title { font-family: "Cormorant Garamond", serif; font-size: 26px; font-weight: 500; margin: 26px 0 12px; display: flex; justify-content: space-between; align-items: baseline; }
+.section-title small { font-family: Inter, sans-serif; font-size: 13px; color: var(--ink3); font-weight: 500; }
+
+.btn { min-height: 46px; border-radius: 999px; padding: 0 18px; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 14px; transition: transform .15s, background-color .3s, opacity .2s; }
+.btn.primary { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: var(--on-accent); box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 35%, transparent); }
+.btn.ghost { background: var(--glass-strong); border: 1px solid var(--stroke); }
+.btn.danger { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+.btn.full { width: 100%; }
+.btn-row { display: flex; gap: 10px; margin-top: 14px; }
+.btn-row .btn { flex: 1; }
+
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; background: var(--accent-soft); color: var(--ink); }
+.chip.cat { background: color-mix(in srgb, var(--c) 22%, transparent); }
+.chip.cat i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); }
+.dotc { width: 8px; height: 8px; border-radius: 50%; background: var(--c); flex: none; }
+
+/* ============ СЕГОДНЯ ============ */
+.date { color: var(--ink2); font-size: 14px; margin: 4px 0 0; }
+.hello { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 46px; line-height: 1.02; margin: 8px 0 10px; letter-spacing: -.01em; }
+.hello .a { color: var(--accent); }
+.lead { color: var(--ink2); margin: 0 0 22px; max-width: 300px; }
+
+.brief-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+.brief-head h2 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 28px; margin: 0; line-height: 1; }
+.brief-item { display: flex; gap: 12px; padding: 10px 10px; margin: 0 -10px; border-radius: 16px; transition: background-color .35s; }
+.brief-item .n { font-family: "Cormorant Garamond", serif; font-size: 22px; color: var(--ink3); width: 14px; line-height: 1.1; }
+.brief-item p { margin: 4px 0 0; font-size: 14px; color: var(--ink2); }
+.brief-item.on { background: var(--accent-soft); }
+.brief-item.on .n { color: var(--accent); }
+.player { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.player .btn { padding: 0 18px 0 14px; }
+.track { flex: 1; height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.track b { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 4px; transition: width .25s linear; }
+.ptime { font-size: 12px; color: var(--ink3); font-variant-numeric: tabular-nums; min-width: 72px; text-align: right; }
+.mini-orb { --s: 34px; }
+
+.task { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; min-height: 48px; padding: 8px 0; border-bottom: 1px solid var(--line); transition: transform .15s; }
+.task:last-child { border-bottom: 0; }
+.task .box { width: 24px; height: 24px; border-radius: 50%; border: 1.6px solid var(--ink3); display: grid; place-items: center; flex: none; transition: background-color .25s, border-color .25s; }
+.task .box svg { width: 14px; height: 14px; stroke: var(--on-accent); stroke-width: 2.4; fill: none; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset .3s .05s; }
+.task.done .box { background: var(--accent); border-color: var(--accent); }
+.task.done .box svg { stroke-dashoffset: 0; }
+.task .t { flex: 1; font-size: 15px; transition: color .3s; position: relative; }
+.task.done .t { color: var(--ink3); text-decoration: line-through; text-decoration-color: var(--ink3); }
+.task .meta { font-size: 12px; color: var(--ink3); display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.task.pop .box { animation: pop .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes pop { 0% { transform: scale(.6); } 60% { transform: scale(1.18); } 100% { transform: scale(1); } }
+.counter { font-size: 13px; color: var(--ink3); font-weight: 500; }
+
+.promise { background: linear-gradient(150deg, color-mix(in srgb, var(--blob1) 45%, var(--glass)), var(--glass) 60%); }
+.promise q { display: block; font-family: "Cormorant Garamond", serif; font-size: 27px; line-height: 1.12; margin: 2px 0 8px; quotes: "«" "»"; }
+.promise p { color: var(--ink2); margin: 0; font-size: 14px; }
+.promise.leaving { animation: leave .4s forwards; }
+@keyframes leave { to { opacity: 0; transform: translateX(40px) scale(.96); } }
+
+.linkrow { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 60px; padding: 0 18px; border-radius: 22px; font-weight: 500; }
+.linkrow span { display: flex; align-items: center; gap: 10px; }
+
+/* ============ МЫСЛИ ============ */
+.search { display: flex; align-items: center; gap: 10px; height: 50px; border-radius: 999px; padding: 0 6px 0 16px; margin-bottom: 12px; }
+.search input { flex: 1; border: 0; background: none; outline: none; height: 100%; font-size: 15px; min-width: 0; }
+.search input::placeholder { color: var(--ink3); }
+.search .icon-btn { width: 40px; height: 40px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; margin: 0 -20px 16px; padding: 2px 20px 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip-btn { flex: none; min-height: 40px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 7px; background: var(--glass); border: 1px solid var(--stroke); transition: transform .15s, background-color .25s, color .25s; }
+.chip-btn.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.note { margin: 0; padding: 14px; border-radius: 24px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; transition: transform .15s; min-height: 150px; outline-offset: 3px; }
+.note:active { transform: scale(.97); }
+.note.wide { grid-column: 1 / -1; min-height: 0; }
+.note h3 { font-size: 15px; font-weight: 600; margin: 0; line-height: 1.25; }
+.note .time { font-size: 11px; color: var(--ink3); }
+.note .ntop { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; color: var(--ink2); font-size: 13px; margin: 0; }
+.note.idea { background: linear-gradient(155deg, color-mix(in srgb, var(--c) 32%, var(--glass-strong)) 0%, var(--glass) 75%); }
+.note.idea .lbl { display: flex; align-items: center; gap: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink2); font-weight: 600; }
+.note.reflection q { font-family: "Cormorant Garamond", serif; font-size: 21px; line-height: 1.12; quotes: "«" "»"; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+.note.numbers .big { font-family: "Cormorant Garamond", serif; font-size: 38px; line-height: 1; font-weight: 500; color: var(--accent); }
+.note.numbers ul { list-style: none; margin: 0; padding: 0; font-size: 12px; color: var(--ink2); }
+.note.numbers li { display: flex; justify-content: space-between; gap: 6px; padding: 3px 0; border-top: 1px dashed var(--line); }
+.note.fresh { animation: fresh 2.2s ease; }
+@keyframes fresh { 0%, 40% { box-shadow: 0 0 0 3px var(--accent), var(--shadow); } 100% { box-shadow: var(--shadow); } }
+
+.vpill { display: flex; align-items: center; gap: 10px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--stroke); }
+.vpill .play { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: var(--bg); flex: none; transition: transform .15s; }
+.vpill .play:active { transform: scale(.92); }
+.wave { flex: 1; display: flex; align-items: center; gap: 2px; height: 28px; overflow: hidden; }
+.wave i { flex: 1; max-width: 3px; min-width: 2px; border-radius: 2px; background: var(--ink3); transition: background-color .2s; }
+.wave i.on { background: var(--accent); }
+.vpill .dur { font-size: 12px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.empty { text-align: center; padding: 34px 10px; color: var(--ink2); }
+.empty .serif { font-size: 26px; color: var(--ink); margin-bottom: 6px; }
+
+/* ============ ПЛАН ============ */
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 18px; }
+.day { min-height: 66px; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; color: var(--ink2); background: var(--glass); border: 1px solid var(--stroke); transition: transform .15s, background-color .25s, color .25s; position: relative; }
+.day b { font-size: 18px; font-weight: 500; color: var(--ink); font-family: "Cormorant Garamond", serif; font-size: 22px; line-height: 1; }
+.day.today b { color: var(--accent); }
+.day.on { background: var(--ink); color: color-mix(in srgb, var(--bg) 75%, transparent); border-color: var(--ink); }
+.day.on b { color: var(--bg); }
+.day .dots { display: flex; gap: 2px; height: 4px; }
+.day .dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+.day.on .dots i { background: var(--bg); }
+.day:active { transform: scale(.94); }
+
+.goal { padding: 0; overflow: hidden; }
+.goal-head { width: 100%; text-align: left; padding: 16px 18px; display: block; }
+.goal-head .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.goal-head h3 { margin: 0; font-family: "Cormorant Garamond", serif; font-size: 22px; font-weight: 500; line-height: 1.1; }
+.goal-head .chev { transition: transform .3s; color: var(--ink3); }
+.goal.open .chev { transform: rotate(90deg); }
+.bar { height: 8px; border-radius: 8px; background: var(--line); overflow: hidden; margin: 12px 0 6px; }
+.bar b { display: block; height: 100%; border-radius: 8px; background: linear-gradient(90deg, color-mix(in srgb, var(--c) 70%, var(--accent2)), var(--c)); transition: width .8s cubic-bezier(.2,.8,.2,1); }
+.goal-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink3); }
+.goal-meta b { color: var(--ink); font-weight: 600; }
+.goal-steps { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s ease; }
+.goal.open .goal-steps { grid-template-rows: 1fr; }
+.goal-steps > div { overflow: hidden; padding: 0 18px; }
+.goal.open .goal-steps > div { padding-bottom: 8px; }
+
+.idea-row { display: flex; align-items: center; gap: 12px; padding: 14px 14px 14px 16px; border-radius: 22px; margin-bottom: 10px; }
+.idea-row .txt { flex: 1; }
+.idea-row .txt b { display: block; font-weight: 500; font-size: 14px; line-height: 1.3; }
+.idea-row .txt small { color: var(--ink3); font-size: 12px; }
+.idea-row .btn { min-height: 40px; padding: 0 14px; font-size: 13px; flex: none; }
+.idea-row .btn.added { background: var(--accent-soft); color: var(--accent); box-shadow: none; }
+
+/* ============ РАЗГОВОР ============ */
+.talk { display: flex; flex-direction: column; align-items: center; min-height: 100%; padding-bottom: 6px; }
+.talk .topbar { width: 100%; }
+.call-pill { font-variant-numeric: tabular-nums; }
+.call-pill .live { width: 8px; height: 8px; border-radius: 50%; background: #5DC98A; box-shadow: 0 0 0 4px rgba(93,201,138,.2); }
+.status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink2); font-weight: 500; letter-spacing: .02em; height: 30px; }
+.status i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: blink 1.4s infinite; }
+@keyframes blink { 50% { opacity: .25; } }
+.orb-btn { border-radius: 50%; margin: 8px 0 4px; position: relative; }
+.orb-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 10px; }
+.talk-said { min-height: 22px; font-size: 13px; color: var(--ink3); text-align: center; max-width: 300px; margin-top: 8px; }
+.talk-reply { font-family: "Cormorant Garamond", serif; font-size: 27px; line-height: 1.16; text-align: center; min-height: 128px; max-width: 330px; margin: 6px 0 10px; }
+.talk-reply .w, .rec-text .w { display: inline-block; animation: word .45s ease both; margin-right: .26em; }
+.rec-text .w.fresh { color: var(--ink2); }
+@keyframes word { from { opacity: 0; filter: blur(6px); transform: translateY(4px); } to { opacity: 1; filter: none; transform: none; } }
+.ctrls { display: flex; gap: 22px; align-items: center; margin: 4px 0 14px; }
+.cbtn { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; transition: transform .15s, background-color .3s; }
+.cbtn:active { transform: scale(.92); }
+.cbtn.end { background: var(--danger); color: #fff; border: 0; width: 64px; height: 64px; }
+.cbtn.off { background: var(--ink); color: var(--bg); }
+.write { width: 100%; display: flex; align-items: center; height: 54px; border-radius: 999px; padding: 0 6px 0 18px; }
+.write input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; height: 100%; font-size: 15px; }
+.write input::placeholder { color: var(--ink3); }
+.write button { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); transition: transform .15s; }
+.write button:active { transform: scale(.9); }
+
+.bubble { max-width: 84%; padding: 10px 14px; border-radius: 20px; margin-bottom: 8px; font-size: 14px; animation: rise .35s both; }
+.bubble.ai { background: var(--glass-strong); border: 1px solid var(--stroke); border-bottom-left-radius: 6px; }
+.bubble.me { margin-left: auto; background: var(--accent); color: var(--on-accent); border-bottom-right-radius: 6px; }
+.bubble small { display: block; font-size: 11px; opacity: .6; margin-top: 3px; }
+
+/* ============ ОРБ ============ */
+.orb-halo { position: relative; display: grid; place-items: center; }
+.orb-halo::before { content: ""; position: absolute; inset: -22%; border-radius: 50%; background: radial-gradient(circle, var(--orb-glow), transparent 66%); filter: blur(14px); animation: halo 4.5s ease-in-out infinite; pointer-events: none; }
+@keyframes halo { 50% { transform: scale(1.1); opacity: .75; } }
+.orb {
+  --s: 200px; --spd: 10s;
+  position: relative; width: var(--s); height: var(--s); border-radius: 50%; overflow: hidden; isolation: isolate;
+  background: radial-gradient(circle at 50% 55%, var(--o4) 0 35%, color-mix(in srgb, var(--o2) 55%, var(--o4)) 100%);
+  box-shadow: inset 0 0 calc(var(--s) * .1) rgba(255,255,255,calc(var(--gloss) * .7)), 0 calc(var(--s) * .1) calc(var(--s) * .3) var(--orb-glow);
+  animation: breathe 5s ease-in-out infinite;
+  transition: filter .5s;
+}
+.orb .b { position: absolute; width: 72%; height: 72%; border-radius: 50%; filter: blur(calc(var(--s) * .09)); opacity: .92; animation: orbit var(--spd) linear infinite; }
+.orb .b1 { background: var(--o1); left: -8%; top: 4%; transform-origin: 78% 62%; }
+.orb .b2 { background: var(--o2); right: -12%; top: -6%; transform-origin: 28% 72%; animation-direction: reverse; animation-duration: calc(var(--spd) * 1.3); }
+.orb .b3 { background: var(--o3); left: 18%; bottom: -22%; transform-origin: 52% 18%; animation-duration: calc(var(--spd) * .8); }
+.orb .gloss { position: absolute; inset: 0; border-radius: 50%; opacity: var(--gloss);
+  background: radial-gradient(circle at 32% 25%, rgba(255,255,255,.95) 0, rgba(255,255,255,.35) 11%, transparent 30%), radial-gradient(circle at 72% 84%, rgba(255,255,255,.35), transparent 38%); }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
+.orb.listening { animation: listen 3.2s ease-in-out infinite; --spd: 8s; }
+@keyframes listen { 0%, 100% { transform: scale(.97); } 50% { transform: scale(1.07); } }
+.orb.thinking { --spd: 4s; animation: think 1.5s ease-in-out infinite; }
+@keyframes think { 0%, 100% { transform: scale(1) rotate(0); filter: brightness(1); } 50% { transform: scale(.96) rotate(8deg); filter: brightness(1.1); } }
+.orb.speaking { --spd: 2.2s; animation: speak .8s ease-in-out infinite; filter: saturate(1.3); }
+@keyframes speak { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.06); } 55% { transform: scale(.98); } 80% { transform: scale(1.04); } }
+.orb.paused, .orb.muted { animation: none; filter: grayscale(.45) opacity(.75); }
+.orb.paused .b, .orb.muted .b { animation-play-state: paused; }
+
+/* ============ НИЖНЕЕ МЕНЮ ============ */
+.nav {
+  position: absolute; z-index: 30; left: 12px; right: 12px; bottom: calc(10px + var(--bottom));
+  height: 74px; border-radius: 30px; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center;
+  transition: transform .4s, opacity .3s;
+}
+.navbtn { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; font-weight: 500; color: var(--ink3); min-height: 56px; justify-content: center; transition: color .25s, transform .15s; }
+.navbtn.on { color: var(--accent); }
+.navbtn .ico { width: 23px; height: 23px; }
+.rec-btn { justify-self: center; width: 70px; height: 70px; margin-top: -30px; border-radius: 50%; display: grid; place-items: center; position: relative; transition: transform .15s; }
+.rec-btn .orb { --s: 70px; --spd: 9s; box-shadow: 0 8px 26px var(--orb-glow), 0 0 0 5px var(--glass-strong); }
+.rec-btn .mic { position: absolute; color: #fff; filter: drop-shadow(0 1px 3px rgba(60,30,90,.35)); }
+.rec-btn:active { transform: scale(.92); }
+
+/* ============ ЗАПИСЬ ============ */
+.overlay { position: absolute; inset: 0; z-index: 60; background: var(--bg); display: none; flex-direction: column; overflow-y: auto; scrollbar-width: none; }
+.overlay.open { display: flex; animation: up .5s cubic-bezier(.2,.8,.2,1); }
+.overlay.closing { animation: down .35s ease forwards; }
+@keyframes up { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes down { to { transform: translateY(100%); } }
+.rec { flex: 1; display: flex; flex-direction: column; align-items: center; padding: var(--top) 20px calc(24px + var(--bottom)); min-height: 100%; }
+.rec .topbar { width: 100%; }
+.rec-time { font-family: "Cormorant Garamond", serif; font-size: 40px; font-variant-numeric: tabular-nums; margin: 2px 0 14px; }
+.rec-text { font-family: "Cormorant Garamond", serif; font-size: 25px; line-height: 1.18; text-align: center; min-height: 120px; max-width: 340px; margin: 26px 0 8px; }
+.rec-text .ph { color: var(--ink3); font-style: italic; }
+.rec-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 72px; align-content: flex-start; max-width: 340px; }
+.tag { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; animation: tagin .5s cubic-bezier(.3,1.5,.5,1) both; }
+.tag em { font-style: normal; color: var(--ink3); }
+@keyframes tagin { from { opacity: 0; transform: scale(.7) translateY(8px); } to { opacity: 1; transform: none; } }
+.rec-ctrl { display: flex; align-items: center; gap: 26px; margin-top: auto; padding-top: 14px; }
+.rec-ctrl .cbtn.stop { width: 76px; height: 76px; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: var(--on-accent); box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 40%, transparent); }
+.rec-ctrl small { display: block; text-align: center; font-size: 11px; color: var(--ink3); margin-top: 6px; }
+.processing { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; }
+.processing .serif { font-size: 30px; }
+.steps { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--ink3); min-width: 200px; }
+.steps div { display: flex; align-items: center; gap: 8px; transition: color .3s; }
+.steps div.ok { color: var(--ink); }
+.steps div svg { width: 16px; height: 16px; stroke: var(--accent); stroke-width: 2; fill: none; opacity: 0; transition: opacity .3s; }
+.steps div.ok svg { opacity: 1; }
+.result { width: 100%; animation: rise .5s both; }
+.result h2 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 36px; margin: 6px 0 14px; line-height: 1; }
+.result .quote { font-family: "Cormorant Garamond", serif; font-size: 21px; line-height: 1.2; margin: 14px 0 6px; }
+.chiprow { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ============ ШТОРКА ============ */
+.sheet-wrap { position: absolute; inset: 0; z-index: 80; pointer-events: none; visibility: hidden; transition: visibility 0s .45s; }
+.sheet-wrap.open { visibility: visible; transition: none; }
+.sheet-wrap .backdrop { position: absolute; inset: 0; background: rgba(30,20,45,.28); opacity: 0; transition: opacity .3s; }
+[data-theme="dark"] .sheet-wrap .backdrop { background: rgba(0,0,0,.5); }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; overflow-y: auto; border-radius: 32px 32px 0 0; padding: 10px 20px calc(24px + var(--bottom)); background: var(--glass-strong); -webkit-backdrop-filter: blur(30px) saturate(150%); backdrop-filter: blur(30px) saturate(150%); border-top: 1px solid var(--stroke); transform: translateY(105%); transition: transform .42s cubic-bezier(.2,.8,.2,1); scrollbar-width: none; }
+[data-theme="light"] .sheet { background: rgba(250,246,253,.9); }
+[data-theme="dark"] .sheet { background: rgba(30,35,25,.94); }
+.sheet-wrap.open { pointer-events: auto; }
+.sheet-wrap.open .backdrop { opacity: 1; }
+.sheet-wrap.open .sheet { transform: none; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: var(--ink3); opacity: .5; margin: 0 auto 8px; }
+.sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+.sheet h2 { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size: 32px; line-height: 1.05; margin: 6px 0 6px; }
+.sheet .full { font-size: 16px; line-height: 1.55; margin: 14px 0; }
+.sheet .meta { color: var(--ink3); font-size: 13px; }
+.sheet h4 { margin: 18px 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink3); }
+.confirm { margin-top: 12px; padding: 14px; border-radius: 20px; background: color-mix(in srgb, var(--danger) 10%, transparent); animation: rise .3s both; }
+.confirm p { margin: 0 0 10px; font-weight: 500; }
+.cat-list button { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 0 12px; border-radius: 16px; font-size: 16px; transition: background-color .2s; }
+.cat-list button.on { background: var(--accent-soft); font-weight: 600; }
+.cat-list button .dotc { width: 12px; height: 12px; }
+.cat-list button svg { margin-left: auto; color: var(--accent); }
+
+.set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.set-row b { display: block; font-weight: 500; }
+.set-row small { color: var(--ink3); font-size: 12px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 6px; }
+.seg button { border-radius: 20px; padding: 10px; text-align: left; border: 1.5px solid var(--line); min-height: 44px; transition: border-color .2s, transform .15s; }
+.seg button.on { border-color: var(--accent); }
+.seg button:active { transform: scale(.97); }
+.swatch { height: 58px; border-radius: 14px; margin-bottom: 8px; position: relative; overflow: hidden; }
+.swatch.light { background: radial-gradient(circle at 20% 30%, #F7B3D2, transparent 55%), radial-gradient(circle at 80% 70%, #B3D7F6, transparent 55%), radial-gradient(circle at 60% 20%, #C8B4F6, transparent 50%), #F7F2FB; }
+.swatch.dark { background: radial-gradient(circle at 20% 30%, #5B4A2C, transparent 55%), radial-gradient(circle at 80% 70%, #2B4438, transparent 55%), radial-gradient(circle at 60% 20%, #3F5530, transparent 50%), #161B13; }
+.seg span { font-weight: 600; font-size: 14px; }
+.seg small { display: block; color: var(--ink3); font-size: 12px; }
+.switch { width: 52px; height: 32px; border-radius: 20px; background: var(--line); position: relative; flex: none; transition: background-color .25s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.15); transition: transform .25s; }
+.switch.on { background: var(--accent); }
+.switch.on::after { transform: translateX(20px); }
+.switch-hit { min-height: 44px; min-width: 52px; display: grid; place-items: center; }
+
+/* ============ ИТОГИ ============ */
+.summary { font-family: "Cormorant Garamond", serif; font-size: 24px; line-height: 1.18; margin: 0 0 18px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat { border-radius: 22px; padding: 14px 12px; }
+.stat b { display: block; font-family: "Cormorant Garamond", serif; font-size: 34px; line-height: 1; font-weight: 500; }
+.stat small { color: var(--ink2); font-size: 12px; line-height: 1.2; display: block; margin-top: 4px; }
+.list { list-style: none; padding: 0; margin: 0; }
+.list li { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.list li:last-child { border-bottom: 0; }
+.list li .dotc { margin-top: 6px; }
+.list li small { display: block; color: var(--ink3); font-size: 12px; }
+.chart .row { display: grid; grid-template-columns: 96px 1fr 24px; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; }
+.chart .track2 { height: 12px; border-radius: 8px; background: var(--line); overflow: hidden; }
+.chart .track2 b { display: block; height: 100%; border-radius: 8px; background: var(--c); width: 0; transition: width .9s cubic-bezier(.2,.8,.2,1); }
+.chart .num { text-align: right; color: var(--ink2); font-variant-numeric: tabular-nums; }
+
+/* ============ ТОСТ ============ */
+.toast { position: absolute; z-index: 90; left: 16px; right: 16px; bottom: calc(100px + var(--bottom)); min-height: 52px; border-radius: 20px; display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 18px; background: var(--ink); color: var(--bg); font-size: 14px; font-weight: 500; transform: translateY(20px); opacity: 0; pointer-events: none; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .3s; }
+.toast.show { transform: none; opacity: 1; pointer-events: auto; }
+.sheet-wrap.open ~ .toast, .overlay.open ~ .toast { bottom: auto; top: calc(var(--top) + 4px); }
+.toast span { flex: 1; }
+.toast button { min-height: 40px; padding: 0 14px; border-radius: 14px; background: color-mix(in srgb, var(--bg) 18%, transparent); font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="device" id="device">
+  <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="statusbar" aria-hidden="true">
+    <span id="sbTime">9:41</span>
+    <span class="island"></span>
+    <span class="sys">
+      <svg width="18" height="12" viewBox="0 0 18 12"><g fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></g></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M1.5 4.5a9.5 9.5 0 0 1 13 0M4 7.3a5.8 5.8 0 0 1 8 0"/><circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2.5" y="2.5" width="17" height="8" rx="2" fill="currentColor"/><rect x="25" y="4.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".4"/></svg>
+    </span>
+  </div>
+
+  <main class="screen" id="screen"></main>
+
+  <nav class="nav glass" id="nav" aria-label="Навигация">
+    <button class="navbtn" data-act="go" data-screen="today"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>Сегодня</button>
+    <button class="navbtn" data-act="go" data-screen="thoughts"><svg class="ico" viewBox="0 0 24 24"><path d="M7 18.5h9.5a4.5 4.5 0 0 0 .6-8.96A6 6 0 0 0 5.6 11.1 3.7 3.7 0 0 0 7 18.5Z"/></svg>Мысли</button>
+    <button class="rec-btn" data-act="record" aria-label="Записать мысль">
+      <div class="orb"><span class="b b1"></span><span class="b b2"></span><span class="b b3"></span><span class="gloss"></span></div>
+      <svg class="ico mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+    </button>
+    <button class="navbtn" data-act="go" data-screen="plan"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="4"/><path d="M8 3v4M16 3v4M3.5 10h17M8 14h3"/></svg>План</button>
+    <button class="navbtn" data-act="go" data-screen="talk"><svg class="ico" viewBox="0 0 24 24"><path d="M5 4.5h3l1.6 4-2 1.3a10 10 0 0 0 6.6 6.6l1.3-2 4 1.6v3a1.8 1.8 0 0 1-2 1.8A16 16 0 0 1 3.2 6.5 1.8 1.8 0 0 1 5 4.5Z"/></svg>Разговор</button>
+  </nav>
+
+  <section class="overlay" id="rec" aria-label="Запись мысли"></section>
+
+  <div class="sheet-wrap" id="sheetWrap">
+    <div class="backdrop" data-act="close-sheet"></div>
+    <div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div><div id="sheetBody"></div></div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+'use strict';
+/* ================= УТИЛИТЫ ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const H = 3600e3, DAY = 864e5;
+const pad = n => String(n).padStart(2, '0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const mondayOf = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - (x.getDay() + 6) % 7); return x; };
+const todayIso = () => iso(new Date());
+const todayWd = () => (new Date().getDay() + 6) % 7;
+const fmt = s => `${Math.floor(s / 60)}:${pad(Math.floor(s % 60))}`;
+const uid = () => Math.random().toString(36).slice(2, 9);
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function plural(n, f) { const a = Math.abs(n) % 100, b = a % 10; if (a > 10 && a < 20) return f[2]; if (b > 1 && b < 5) return f[1]; if (b === 1) return f[0]; return f[2]; }
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const WD = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+const dateOfWd = wd => { const d = mondayOf(new Date()); d.setDate(d.getDate() + wd); return d; };
+const longDate = d => d.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
+
+const I = {
+  play: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor" stroke="none"/></svg>',
+  pause: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke-width="2.4"/></svg>',
+  stop: '<svg class="ico" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor" stroke="none"/></svg>',
+  x: '<svg class="ico" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  checkIco: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  search: '<svg class="ico sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>',
+  gear: '<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6"/></svg>',
+  chart: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>',
+  right: '<svg class="ico sm" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>',
+  back: '<svg class="ico" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  send: '<svg class="ico" viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>',
+  mic: '<svg class="ico" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>',
+  micOff: '<svg class="ico" viewBox="0 0 24 24"><path d="M15 9.5V6a3 3 0 0 0-5.8-1M9 9v2a3 3 0 0 0 4.6 2.5M5.5 11a6.5 6.5 0 0 0 10.8 4.9M18.5 11a6.5 6.5 0 0 1-.4 2.2M12 17.5V21M4 4l16 16"/></svg>',
+  hang: '<svg class="ico" viewBox="0 0 24 24"><path d="M3 14.5c5-4.5 13-4.5 18 0l-2 2.7-3.4-1.3V13a12 12 0 0 0-7.2 0v2.9L5 17.2z" fill="currentColor" stroke="none"/></svg>',
+  text: '<svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6h15M4.5 11h15M4.5 16h9"/></svg>',
+  spark: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M12 3.5c.6 4.3 2.2 5.9 6.5 6.5-4.3.6-5.9 2.2-6.5 6.5-.6-4.3-2.2-5.9-6.5-6.5 4.3-.6 5.9-2.2 6.5-6.5Z"/></svg>',
+  plus: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  trash: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12.5h8L17 7"/></svg>',
+  flag: '<svg class="ico sm" viewBox="0 0 24 24"><path d="M6 21V4M6 4h10l-2 4 2 4H6"/></svg>',
+  clock: '<svg class="ico sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+};
+const orb = (cls = '', size) => `<div class="orb ${cls}"${size ? ` style="--s:${size}px"` : ''}><span class="b b1"></span><span class="b b2"></span><span class="b b3"></span><span class="gloss"></span></div>`;
+
+/* ================= КАТЕГОРИИ ================= */
+const CATS = [
+  { id: 'kedice', name: 'Kedice' }, { id: 'embroidery', name: 'Вышивка' }, { id: 'travel', name: 'Путешествия' },
+  { id: 'content', name: 'Контент' }, { id: 'lila', name: 'Lila' }, { id: 'personal', name: 'Личное' }, { id: 'ideas', name: 'Идеи' },
+];
+const catName = id => (CATS.find(c => c.id === id) || {}).name || id;
+const cv = id => `--c:var(--cat-${id})`;
+const catChip = id => `<span class="chip cat" style="${cv(id)}"><i></i>${catName(id)}</span>`;
+const TYPES = { voice: 'Голосовая', idea: 'Идея', reflection: 'Рефлексия', numbers: 'Цифры' };
+
+/* ================= ТЕСТОВЫЕ ДАННЫЕ ================= */
+function seed() {
+  const now = Date.now(), twd = todayWd();
+  const midnight = new Date(); midnight.setHours(0, 0, 0, 0);
+  const at = (h, today) => today ? Math.max(now - h * H, midnight.getTime() + (8 - h) * 60e3 * 10) : now - h * H;
+  const notes = [
+    { id: 'n1', cat: 'kedice', type: 'voice', dur: 48, created: at(1, 1), title: 'Уроки по Каппадокии', text: 'Каппадокия почти готова: осталось два урока — рынок в Гёреме и разговор с хозяином пещерного отеля. Хочу, чтобы фразы были живые, а не из разговорника.' },
+    { id: 'n10', cat: 'content', type: 'voice', dur: 41, created: at(2.5, 1), title: 'Три идеи для рилс', text: 'Три рилс: «мой день с AI-ассистентом», «как я учу турецкий через своё же приложение» и «вышивка как антистресс после созвонов».' },
+    { id: 'n15', cat: 'personal', type: 'voice', dur: 27, created: at(4, 1), title: 'Вернуть тренировки дома', text: 'Вернуть тренировки дома: три раза в неделю по двадцать минут. Коврик уже лежит, осталось перестать складывать на него вещи.' },
+    { id: 'n6', cat: 'embroidery', type: 'voice', dur: 32, created: at(6, 1), title: 'Название для магазина', text: 'Варианты названия: «Стежок», «Тихий вечер», «Игла и чай». Первое слишком простое, второе нравится больше всего.' },
+    { id: 'n2', cat: 'kedice', type: 'numbers', created: at(26), title: 'Слова в Каппадокии', big: '214 слов', lines: [['Уроков', '6'], ['Слов в уроке', '≈ 36'], ['Осталось уроков', '2']], text: 'В блоке про Каппадокию 214 слов: 6 уроков, примерно по 36 слов. Осталось два урока. И ещё баг: на длинных словах в карточках съезжает перевод.' },
+    { id: 'n3', cat: 'kedice', type: 'idea', created: at(30), title: 'Эпизод блога: как я делаю приложение с AI', text: 'Показать честно: где AI реально помогает, а где я три часа спорю с ним из-за одной кнопки. Без «посмотрите, как легко».' },
+    { id: 'n4', cat: 'embroidery', type: 'idea', created: at(50), title: 'Магазин вышивки', text: 'Онлайн-магазин с наборами: схема, нитки, пяльцы и открытка от меня. Не просто товар, а вечер, который ты себе даришь.' },
+    { id: 'n5', cat: 'embroidery', type: 'numbers', created: at(52), title: 'Материалы на один набор', big: '≈ 1 850 ₽', lines: [['Нитки мулине', '640 ₽'], ['Канва и пяльцы', '780 ₽'], ['Упаковка', '430 ₽']], text: 'Себестоимость одного набора около 1 850 ₽: нитки мулине 640 ₽, канва и пяльцы 780 ₽, упаковка 430 ₽. Продавать дешевле 3 500 ₽ нет смысла.' },
+    { id: 'n7', cat: 'travel', type: 'idea', created: at(70), title: 'Сидней через Мендосу и Сантьяго', text: 'Не лететь напрямую, а сделать остановку: неделя винных долин в Мендосе, потом Сантьяго, и только потом Сидней.' },
+    { id: 'n8', cat: 'travel', type: 'reflection', created: at(74), title: 'Пожить в Таиланде', text: 'Я не хочу отпуск. Я хочу пожить месяц там, где утро начинается с моря.' },
+    { id: 'n9', cat: 'travel', type: 'idea', created: at(96), title: 'Эко-отель в горах', text: 'Мечта: маленький эко-отель на десять домиков. Патагония, север Италии или Япония — там, где тихо и много неба.' },
+    { id: 'n11', cat: 'content', type: 'numbers', created: at(100), title: 'Монтаж эпизода', big: '4 из 7', lines: [['Сцен готово', '4'], ['Озвучка', 'нет'], ['Субтитры', 'нет']], text: 'Смонтировано 4 сцены из 7. Осталась озвучка и субтитры. Если сесть в субботу утром — успею к воскресенью.' },
+    { id: 'n12', cat: 'lila', type: 'idea', created: at(120), title: 'Прототип Lila', text: 'Собрать кликабельный прототип: запись мыслей одной кнопкой, утренний бриф и разговор голосом, как по телефону.' },
+    { id: 'n13', cat: 'lila', type: 'reflection', created: at(124), title: 'Какой должна быть Lila', text: 'Хочу, чтобы ассистент ощущался как тёплая подруга, а не как таск-менеджер.' },
+    { id: 'n14', cat: 'personal', type: 'reflection', created: at(140), title: 'Звонки после восьми', text: 'После восьми вечера — только сообщения. Мой вечер тоже рабочее время, только для меня.' },
+    { id: 'n16', cat: 'ideas', type: 'idea', created: at(150), title: 'Турецкий в вышивке', text: 'Вышивать турецкие слова на мини-пяльцах — и мерч для Kedice, и товар для магазина. Первое слово — «merhaba».' },
+  ];
+  const T = (title, cat, wd, o = {}) => ({ id: uid(), title, cat, date: iso(dateOfWd(wd === 'T' ? twd : wd)), done: !!o.done && wd !== 'T' && wd < twd, focus: !!o.focus, noteId: o.note || null });
+  const tasks = [
+    T('Доделать уроки по Каппадокии', 'kedice', 'T', { focus: 1, note: 'n1' }),
+    T('Исправить баг в карточках слов', 'kedice', 'T', { focus: 1, note: 'n2' }),
+    T('Собрать референсы для магазина вышивки', 'embroidery', 'T', { focus: 1, note: 'n4' }),
+    T('Подготовить промпт для Lila', 'lila', 'T', { focus: 1, note: 'n12' }),
+    T('Выбрать стиль для Lila', 'lila', 0, { done: 1, note: 'n13' }),
+    T('Тренировка дома, 20 минут', 'personal', 0, { done: 1, note: 'n15' }),
+    T('Придумать название магазина', 'embroidery', 1, { note: 'n6' }),
+    T('Смонтировать 4 сцены эпизода', 'content', 1, { done: 1, note: 'n11' }),
+    T('Посчитать стоимость материалов', 'embroidery', 2, { done: 1, note: 'n5' }),
+    T('Сценарий эпизода: как я делаю Kedice с AI', 'kedice', 2, { note: 'n3' }),
+    T('Собрать прототип Lila', 'lila', 3, { note: 'n12' }),
+    T('Сценарий рилс «мой день с AI»', 'content', 3, { note: 'n10' }),
+    T('Тренировка дома, 20 минут', 'personal', 4, { note: 'n15' }),
+    T('Сравнить билеты Мендоса — Сантьяго — Сидней', 'travel', 4, { note: 'n7' }),
+    T('Смонтировать следующий эпизод', 'content', 5, { note: 'n11' }),
+    T('Почитать про эко-отели в Патагонии', 'travel', 6, { note: 'n9' }),
+    T('Вечер без звонков', 'personal', 6, { note: 'n14' }),
+  ];
+  const S = (title, done) => ({ id: uid(), title, done: !!done });
+  const goals = [
+    { id: 'g1', cat: 'kedice', title: 'Выпустить Kedice в App Store', steps: [S('Уроки по Стамбулу', 1), S('Тестовая сборка для друзей', 1), S('Уроки по Каппадокии'), S('Исправить баги в карточках слов'), S('Иконка и скриншоты для стора'), S('Отправить на ревью')] },
+    { id: 'g2', cat: 'embroidery', title: 'Запустить магазин вышивки', steps: [S('Посчитать стоимость материалов', 1), S('Собрать референсы'), S('Придумать название'), S('Сшить три пробных набора'), S('Сделать страницу магазина')] },
+    { id: 'g3', cat: 'lila', title: 'Собрать прототип Lila', steps: [S('Выбрать стиль', 1), S('Подготовить промпт', 1), S('Собрать кликабельный прототип', 1), S('Показать друзьям и собрать отзывы')] },
+  ];
+  const promises = [
+    { id: 'p1', status: 'open', text: 'Не брать звонки после восьми вечера', sub: 'Ты решила это в понедельник. Вчера был созвон в 21:10.' },
+    { id: 'p2', status: 'open', text: 'Вернуть тренировки дома — три раза в неделю', sub: 'На этой неделе была одна. До воскресенья можно успеть ещё две.' },
+    { id: 'p3', status: 'open', text: 'Отправить сценарий эпизода до пятницы', sub: 'Ты записала это голосом во вторник, 9:40.' },
+  ];
+  const ideas = [
+    { id: 'i1', note: 'n10', title: 'Мой день с AI-ассистентом: что реально изменилось', added: false },
+    { id: 'i2', note: 'n3', title: 'Учу турецкий через своё же приложение', added: false },
+    { id: 'i3', note: 'n14', title: 'Вышивка как антистресс после созвонов', added: false },
+    { id: 'i4', note: 'n7', title: 'Сидней через Мендосу: маршрут, придуманный голосом', added: false },
+  ];
+  const chat = [
+    { role: 'ai', text: 'Доброе утро. Бриф готов, когда будешь готова — скажи «давай».', t: now - 3 * H },
+    { role: 'me', text: 'Давай после кофе.', t: now - 3 * H + 60e3 },
+    { role: 'ai', text: 'Договорились. Кофе — это тоже пункт плана.', t: now - 3 * H + 70e3 },
+  ];
+  return { v: 1, theme: 'light', voice: true, weekStart: iso(mondayOf(new Date())), notes, tasks, goals, promises, ideas, chat };
+}
+
+const BRIEF = [
+  { cat: 'kedice', title: 'Kedice: Каппадокия', text: 'Два урока — и блок готов. На это нужно утро, пока голова свежая.' },
+  { cat: 'embroidery', title: 'Вышивка: референсы', text: '20 минут на референсы для магазина. Без перфекционизма.' },
+  { cat: 'personal', title: 'Личное: вечер без звонков', text: 'После восьми только сообщения. Напомню в 19:45.' },
+];
+const BRIEF_LEN = 36;
+
+const PHRASES = [
+  { cat: 'kedice', type: 'Задача', title: 'Каппадокия и баг с переводом', text: 'Так, надо наконец доделать уроки по Каппадокии, и, кажется, в карточках слов опять съезжает перевод. Поправить до пятницы.', tasks: ['Доделать уроки по Каппадокии', 'Исправить съезжающий перевод в карточках'] },
+  { cat: 'embroidery', type: 'Идея', title: 'Наборы вместо готовых работ', text: 'Идея для магазина вышивки: продавать не только готовые работы, а наборы с нитками и схемой. Посчитать, сколько стоит один набор.', tasks: ['Посчитать себестоимость набора'] },
+  { cat: 'travel', type: 'Мечта', title: 'Пожить в эко-отеле волонтёром', text: 'Мысль про эко-отель: может, начать не со строительства, а пожить месяц в таком месте в Патагонии волонтёром.', tasks: ['Найти эко-отели в Патагонии с волонтёрством'] },
+  { cat: 'content', type: 'Идея для контента', title: 'Рилс: неделя с Lila', text: 'Рилс: показать, как я неделю разговариваю с Lila вместо заметок в телефоне. А в конце показать хаос в старых заметках.', tasks: ['Написать сценарий рилс про неделю с Lila'] },
+  { cat: 'personal', type: 'Решение', title: 'После восьми — только сообщения', text: 'Опять созвон в девять вечера. Всё, правило: после восьми только сообщения. И телефон в режим «не беспокоить».', tasks: ['Включить «не беспокоить» с 20:00'] },
+  { cat: 'lila', type: 'Решение', title: 'Стиль Lila выбран', text: 'Для Lila нужно выбрать один стиль и перестать сравнивать референсы. Розовая дымка, решено. Дальше промпт.', tasks: ['Зафиксировать стиль прототипа', 'Дописать промпт для Lila'] },
+];
+
+const SCRIPT = [
+  { me: 'Что у меня сегодня самое важное?', ai: 'Каппадокия. Два урока — и Kedice станет на шаг ближе к App Store. Остальное может подождать до обеда.' },
+  { me: 'А если я не успею?', ai: 'Тогда перенесём баг с карточками на завтра. Но уроки — нет: ты уже дважды их откладывала.' },
+  { me: 'Напомни, что я решила про звонки.', ai: 'После восьми — только сообщения. Вчера ты продержалась до девяти десяти. Сегодня попробуем до конца.' },
+  { me: 'Давай придумаем рилс на завтра.', ai: 'Как насчёт «неделя, когда я разговаривала с ассистентом вместо заметок»? В конце — хаос из старых заметок в телефоне.' },
+];
+const REPLIES = [
+  [/каппадок|kedice|кедис|урок|турец|карточк/i, 'Каппадокия — твой главный фокус. Хочешь, разобью оставшиеся два урока на шаги по 25 минут?'],
+  [/вышив|магазин|набор|стеж/i, 'По магазину вышивки следующий шаг — название. Тебе больше всего нравился «Тихий вечер». Закрепим?'],
+  [/сидне|мендос|сантьяго|таиланд|путеш|патагон|отел|поездк|япон|итал/i, 'Записала. Маршрут через Мендосу и Сантьяго лежит в «Путешествиях» — могу собрать его в один план с датами.'],
+  [/устал|сил нет|не могу|тяжело|выгора/i, 'Слышу. Давай сегодня оставим одну задачу, а остальное перенесём. Это не провал, это план.'],
+  [/рилс|контент|видео|эпизод|монтаж|блог/i, 'Эпизод смонтирован на четыре сцены из семи. Предлагаю субботнее утро — и к воскресенью он готов.'],
+  [/звон|вечер|восьм|созвон/i, 'Правило в силе: после восьми только сообщения. Я напомню в 19:45, а ты просто не бери трубку.'],
+  [/лила|lila|прототип|промпт/i, 'Прототип почти собран — остался показ друзьям. Можно сделать это в выходные за чаем.'],
+  [/привет|здравств|хай/i, 'Привет, Алина. Я здесь. Что у тебя сейчас в голове?'],
+];
+const DEFAULT_REPLIES = [
+  'Поняла. Сохранила это и вернусь к этому вечером, когда будем подводить итоги дня.',
+  'Интересно. Это похоже на то, что ты говорила во вторник. Связать эти мысли?',
+  'Записала. Хочешь, сделаю из этого задачу на завтра?',
+];
+
+/* ================= СОСТОЯНИЕ ================= */
+const KEY = 'lila-demo-v1';
+let st;
+function load() {
+  try { st = JSON.parse(localStorage.getItem(KEY)); } catch (e) { st = null; }
+  if (!st || st.v !== 1 || !Array.isArray(st.notes)) st = seed();
+  // сдвигаем демо-неделю на текущую, чтобы план не устаревал
+  const mon = mondayOf(new Date()), cur = iso(mon);
+  if (st.weekStart !== cur) {
+    const diff = Math.round((mon - new Date(st.weekStart + 'T00:00:00')) / DAY);
+    st.tasks.forEach(t => { const d = new Date(t.date + 'T00:00:00'); d.setDate(d.getDate() + diff); t.date = iso(d); });
+    st.weekStart = cur;
+  }
+  save();
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* приватный режим */ } }
+
+const ui = { screen: 'today', filter: 'all', q: '', planDay: todayWd(), openGoals: new Set(), fresh: null, pop: null, sheet: null, goalPrev: {}, lastPhrase: -1, replyIdx: 0 };
+
+/* ================= ГОЛОС (если в системе есть русский голос) ================= */
+let ruVoice = null;
+function pickVoice() { try { ruVoice = speechSynthesis.getVoices().find(v => /^ru/i.test(v.lang)) || null; } catch (e) { ruVoice = null; } }
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text) {
+  if (!st.voice || !ruVoice) return;
+  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.voice = ruVoice; u.lang = ruVoice.lang; u.rate = 1.02; speechSynthesis.speak(u); } catch (e) { }
+}
+function hush() { try { if ('speechSynthesis' in window) speechSynthesis.cancel(); } catch (e) { } }
+
+/* ================= РЕНДЕР ================= */
+const screens = { today: renderToday, thoughts: renderThoughts, plan: renderPlan, talk: renderTalk, week: renderWeek };
+function render(animate) {
+  const el = $('#screen');
+  const keep = el.scrollTop;
+  el.classList.remove('enter');
+  el.innerHTML = screens[ui.screen]();
+  if (animate) { void el.offsetWidth; el.classList.add('enter'); el.scrollTop = 0; } else el.scrollTop = keep;
+  afterRender();
+  ui.pop = null;
+  $$('#nav .navbtn').forEach(b => b.classList.toggle('on', b.dataset.screen === ui.screen));
+}
+function afterRender() {
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $$('[data-pct]').forEach(b => { b.style.width = b.dataset.pct + '%'; });
+  }));
+  if (ui.screen === 'talk') talkEnter();
+  if (ui.screen === 'today') briefUI();
+  if (ui.fresh) setTimeout(() => { ui.fresh = null; }, 2300);
+}
+function go(name) {
+  if (name === ui.screen) { $('#screen').scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); return; }
+  stopBrief(); stopVoiceNote(); if (ui.screen === 'talk') talkLeave();
+  ui.screen = name;
+  render(true);
+}
+
+/* ---------- СЕГОДНЯ ---------- */
+function greeting() { const h = new Date().getHours(); return h >= 5 && h < 12 ? 'Доброе утро,' : h >= 12 && h < 18 ? 'Добрый день,' : h >= 18 && h < 23 ? 'Добрый вечер,' : 'Доброй ночи,'; }
+function focusTasks() {
+  const t = todayIso();
+  return st.tasks.filter(x => x.date === t).sort((a, b) => (b.focus - a.focus)).slice(0, 4);
+}
+function taskRow(t, opts = {}) {
+  return `<button class="task ${t.done ? 'done' : ''} ${ui.pop === t.id ? 'pop' : ''}" data-act="toggle-task" data-id="${t.id}" aria-pressed="${t.done}">
+    <span class="box">${I.check}</span>
+    <span class="t">${esc(t.title)}${opts.meta !== false ? `<span class="meta"><i class="dotc" style="${cv(t.cat)}"></i>${catName(t.cat)}</span>` : ''}</span>
+  </button>`;
+}
+function renderToday() {
+  const ft = focusTasks();
+  const doneN = ft.filter(t => t.done).length;
+  const p = st.promises.find(x => x.status === 'open');
+  const later = st.promises.filter(x => x.status === 'later').length;
+  const openN = st.promises.filter(x => x.status === 'open').length;
+  const left = ft.length - doneN;
+  return `
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Lila</div>
+    <div class="right">
+      <button class="icon-btn glass" data-act="go" data-screen="week" aria-label="Итоги недели">${I.chart}</button>
+      <button class="icon-btn glass" data-act="open-settings" aria-label="Настройки">${I.gear}</button>
+    </div>
+  </div>
+  <div>
+    <p class="date">${cap(longDate(new Date()))}</p>
+    <h1 class="hello"><span class="a">${greeting()}</span><br>Алина</h1>
+    <p class="lead">${left ? `${left} ${plural(left, ['задача', 'задачи', 'задач'])} в фокусе` : 'Фокус дня закрыт'}${openN ? ` и ${openN} ${plural(openN, ['незакрытое решение', 'незакрытых решения', 'незакрытых решений'])}` : ''}. Начнём с брифа?</p>
+  </div>
+  <section class="card glass" id="briefCard">
+    <div class="brief-head">
+      <div><p class="eyebrow">3 главных пункта</p><h2>Утренний бриф</h2></div>
+      <div class="orb-halo" id="briefOrb" style="visibility:hidden">${orb('mini-orb speaking', 34)}</div>
+    </div>
+    ${BRIEF.map((b, i) => `<div class="brief-item" data-bi="${i}"><span class="n">${i + 1}</span><div><span class="chip cat" style="${cv(b.cat)}"><i></i>${esc(b.title)}</span><p>${esc(b.text)}</p></div></div>`).join('')}
+    <div class="player">
+      <button class="btn primary" data-act="brief" id="briefBtn">${I.play}<span>Послушать</span></button>
+      <div class="track"><b id="briefBar"></b></div>
+      <span class="ptime" id="briefTime">0:00 / ${fmt(BRIEF_LEN)}</span>
+    </div>
+  </section>
+  <section class="card glass">
+    <div class="brief-head"><h2 class="serif" style="font-size:28px;font-weight:500;margin:0">Фокус дня</h2><span class="counter">${doneN} из ${ft.length}</span></div>
+    ${ft.length ? ft.map(t => taskRow(t)).join('') : `<div class="empty"><div class="serif">Свободно</div>На сегодня задач нет. Запиши мысль — я найду в ней задачи.</div>`}
+  </section>
+  ${p ? `<section class="card glass promise" id="promiseCard">
+    <p class="eyebrow">Ты обещала себе</p>
+    <q>${esc(p.text)}</q>
+    <p>${esc(p.sub)}</p>
+    <div class="btn-row">
+      <button class="btn primary" data-act="promise-done" data-id="${p.id}">${I.checkIco}Сделано</button>
+      <button class="btn ghost" data-act="promise-later" data-id="${p.id}">${I.clock}Напомни позже</button>
+    </div>
+  </section>` : `<section class="card glass promise">
+    <p class="eyebrow">Ты обещала себе</p>
+    <q>Все обещания на сегодня закрыты</q>
+    <p>${later ? `${later} ${plural(later, ['отложено', 'отложены', 'отложено'])} на потом.` : 'Можно выдохнуть.'}</p>
+    ${later ? `<div class="btn-row"><button class="btn ghost" data-act="promise-back">Вернуть отложенные</button></div>` : ''}
+  </section>`}
+  <button class="linkrow glass press" data-act="go" data-screen="week"><span>${I.chart}Итоги недели</span>${I.right}</button>`;
+}
+
+/* ---------- МЫСЛИ ---------- */
+const isToday = ts => iso(new Date(ts)) === todayIso();
+function when(ts) {
+  const d = new Date(ts), hm = `${d.getHours()}:${pad(d.getMinutes())}`;
+  if (isToday(ts)) return `Сегодня, ${hm}`;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  if (iso(d) === iso(y)) return `Вчера, ${hm}`;
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).replace('.', '');
+}
+function waveBars(id, n = 34) {
+  let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  let out = '';
+  for (let i = 0; i < n; i++) { h = (h * 1103515245 + 12345) >>> 0; const v = 25 + (h % 75); out += `<i style="height:${Math.round(v * (0.55 + 0.45 * Math.sin(i / n * Math.PI)))}%"></i>`; }
+  return out;
+}
+function noteCard(n) {
+  const fresh = ui.fresh === n.id ? ' fresh' : '';
+  const base = `class="card glass note ${n.type}${n.type === 'voice' ? ' wide' : ''}${fresh}" style="${cv(n.cat)}" data-act="open-note" data-id="${n.id}" role="button" tabindex="0" aria-label="${esc(n.title)}"`;
+  const top = `<div class="ntop">${catChip(n.cat)}<span class="time">${when(n.created)}</span></div>`;
+  if (n.type === 'voice') return `<article ${base}>${top}<h3>${esc(n.title)}</h3>
+    <div class="vpill"><button class="play" data-act="play-note" data-id="${n.id}" aria-label="Прослушать">${I.play}</button><div class="wave" data-wave="${n.id}">${waveBars(n.id)}</div><span class="dur" data-dur="${n.id}">${fmt(n.dur)}</span></div>
+    <p class="clamp">${esc(n.text)}</p></article>`;
+  if (n.type === 'idea') return `<article ${base}>${top}<span class="lbl">${I.spark}Идея</span><h3>${esc(n.title)}</h3><p class="clamp">${esc(n.text)}</p></article>`;
+  if (n.type === 'reflection') return `<article ${base}>${top}<q>${esc(n.text)}</q></article>`;
+  return `<article ${base}>${top}<h3>${esc(n.title)}</h3><div class="big">${esc(n.big)}</div><ul>${n.lines.map(l => `<li><span>${esc(l[0])}</span><b>${esc(l[1])}</b></li>`).join('')}</ul></article>`;
+}
+function filteredNotes() {
+  const q = ui.q.trim().toLowerCase();
+  return st.notes.filter(n => (ui.filter === 'all' || n.cat === ui.filter) &&
+    (!q || (n.title + ' ' + n.text + ' ' + catName(n.cat) + ' ' + (n.big || '')).toLowerCase().includes(q)));
+}
+function thoughtList() {
+  const list = filteredNotes();
+  if (!list.length) return `<div class="empty" style="grid-column:1/-1"><div class="serif">Ничего не нашлось</div>Попробуй другое слово или категорию.<div class="btn-row" style="justify-content:center"><button class="btn ghost" data-act="clear-filters" style="flex:none">Сбросить фильтры</button></div></div>`;
+  return list.map(noteCard).join('');
+}
+function renderThoughts() {
+  const todayN = st.notes.filter(n => isToday(n.created)).length;
+  return `
+  <div class="topbar"><div class="brand"><span class="dot"></span>Lila</div><button class="icon-btn glass" data-act="open-settings" aria-label="Настройки">${I.gear}</button></div>
+  <div><h1 class="title">Мысли</h1><p class="sub" id="thCount">Сегодня ${todayN} ${plural(todayN, ['мысль', 'мысли', 'мыслей'])} · всего ${st.notes.length}</p></div>
+  <label class="search glass">${I.search}<span class="sr">Поиск</span><input id="search" type="text" enterkeyhint="search" placeholder="Найти мысль…" value="${esc(ui.q)}" autocomplete="off"><button class="icon-btn" data-act="clear-search" id="clearSearch" aria-label="Очистить поиск" style="${ui.q ? '' : 'visibility:hidden'}">${I.x}</button></label>
+  <div class="chips" role="tablist">
+    <button class="chip-btn ${ui.filter === 'all' ? 'on' : ''}" data-act="filter" data-cat="all">Все</button>
+    ${CATS.map(c => `<button class="chip-btn ${ui.filter === c.id ? 'on' : ''}" data-act="filter" data-cat="${c.id}"><i class="dotc" style="${cv(c.id)}"></i>${c.name}</button>`).join('')}
+  </div>
+  <div class="grid" id="thoughtList">${thoughtList()}</div>`;
+}
+function refreshThoughtList() { stopVoiceNote(); const el = $('#thoughtList'); if (el) el.innerHTML = thoughtList(); }
+
+/* ---------- ПЛАН ---------- */
+function renderPlan() {
+  const mon = mondayOf(new Date()), twd = todayWd();
+  const dEnd = new Date(mon); dEnd.setDate(dEnd.getDate() + 6);
+  const sm = d => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }).replace('.', '');
+  const sel = dateOfWd(ui.planDay), selIso = iso(sel);
+  const dayTasks = st.tasks.filter(t => t.date === selIso);
+  const goalHtml = st.goals.map(g => {
+    const d = g.steps.filter(s => s.done).length, pct = Math.round(d / g.steps.length * 100);
+    const prev = ui.goalPrev[g.id] ?? 0; ui.goalPrev[g.id] = pct;
+    const open = ui.openGoals.has(g.id);
+    return `<div class="card glass goal ${open ? 'open' : ''}" style="${cv(g.cat)}">
+      <button class="goal-head" data-act="toggle-goal" data-id="${g.id}" aria-expanded="${open}">
+        <div class="row"><h3>${esc(g.title)}</h3><span class="chev">${I.right}</span></div>
+        <div class="bar"><b style="width:${prev}%" data-pct="${pct}"></b></div>
+        <div class="goal-meta"><span>${d} из ${g.steps.length} ${plural(g.steps.length, ['шага', 'шагов', 'шагов'])}</span><b>${pct}%</b></div>
+      </button>
+      <div class="goal-steps"><div>${g.steps.map(s => `<button class="task ${s.done ? 'done' : ''} ${ui.pop === s.id ? 'pop' : ''}" data-act="toggle-step" data-goal="${g.id}" data-id="${s.id}" aria-pressed="${s.done}" ${open ? '' : 'tabindex="-1"'}><span class="box">${I.check}</span><span class="t">${esc(s.title)}</span></button>`).join('')}</div></div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="topbar"><div class="brand"><span class="dot"></span>Lila</div><button class="icon-btn glass" data-act="open-settings" aria-label="Настройки">${I.gear}</button></div>
+  <div><h1 class="title">План</h1><p class="sub">Неделя ${sm(mon)} — ${sm(dEnd)}</p></div>
+  <div class="week">${WD.map((w, i) => {
+    const d = dateOfWd(i), n = st.tasks.filter(t => t.date === iso(d) && !t.done).length;
+    return `<button class="day ${i === ui.planDay ? 'on' : ''} ${i === twd ? 'today' : ''}" data-act="pick-day" data-i="${i}" aria-label="${longDate(d)}">${w}<b>${d.getDate()}</b><span class="dots">${'<i></i>'.repeat(Math.min(n, 3))}</span></button>`;
+  }).join('')}</div>
+  <section class="card glass">
+    <div class="brief-head"><h2 class="serif" style="font-size:24px;font-weight:500;margin:0">${ui.planDay === twd ? 'Сегодня' : cap(sel.toLocaleDateString('ru-RU', { weekday: 'long' }))}<span style="font-family:Inter;font-size:13px;color:var(--ink3);margin-left:8px">${sel.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}</span></h2><span class="counter">${dayTasks.filter(t => t.done).length}/${dayTasks.length}</span></div>
+    ${dayTasks.length ? dayTasks.map(t => taskRow(t)).join('') : `<div class="empty" style="padding:18px 0"><div class="serif">Свободный день</div>Ни одной задачи. Так тоже можно.</div>`}
+  </section>
+  <h2 class="section-title">Цели <small>нажми, чтобы раскрыть</small></h2>
+  ${goalHtml}
+  <h2 class="section-title">Идеи для контента <small>из твоих мыслей</small></h2>
+  ${st.ideas.map(i => { const n = st.notes.find(x => x.id === i.note); return `<div class="idea-row glass">
+    <div class="txt"><b>${esc(i.title)}</b><small>${n ? `из мысли «${esc(n.title)}»` : 'из удалённой мысли'}</small></div>
+    <button class="btn ${i.added ? 'added' : 'primary'}" data-act="idea-to-plan" data-id="${i.id}">${i.added ? I.checkIco + 'В плане' : I.plus + 'В план'}</button>
+  </div>`; }).join('')}`;
+}
+
+/* ---------- РАЗГОВОР ---------- */
+const talk = { state: 'listening', muted: false, step: 0, sec: 0, clock: null, timers: [] };
+function renderTalk() {
+  return `<div class="talk">
+    <div class="topbar">
+      <span class="pill glass call-pill"><i class="live"></i>Lila · <span id="callTime">${fmt(talk.sec)}</span></span>
+      <button class="pill glass press" data-act="end-call">${I.x}<span>Завершить</span></button>
+    </div>
+    <div class="status" id="talkStatus"><i></i><span>Слушаю</span></div>
+    <button class="orb-btn" data-act="orb-tap" aria-label="Переключить состояние разговора"><div class="orb-halo">${orb('listening', 196)}</div></button>
+    <div class="talk-said" id="talkSaid">Нажми на сферу, чтобы переключить: слушаю → думаю → говорю</div>
+    <p class="talk-reply" id="talkReply">Я здесь. Расскажи, что у тебя в голове.</p>
+    <div class="ctrls">
+      <button class="cbtn glass" data-act="mic" id="micBtn" aria-label="Выключить микрофон" aria-pressed="false">${I.mic}</button>
+      <button class="cbtn end" data-act="end-call" aria-label="Завершить разговор">${I.hang}</button>
+      <button class="cbtn glass" data-act="open-history" aria-label="Показать текст разговора">${I.text}</button>
+    </div>
+    <form class="write glass" id="writeForm" autocomplete="off">
+      <input id="writeInput" placeholder="Написать вместо этого…" aria-label="Написать сообщение" maxlength="300">
+      <button type="submit" aria-label="Отправить">${I.send}</button>
+    </form>
+  </div>`;
+}
+function talkEnter() {
+  talk.state = 'listening'; talk.muted = false; talk.sec = 0;
+  clearInterval(talk.clock);
+  talk.clock = setInterval(() => { talk.sec++; const el = $('#callTime'); if (el) el.textContent = fmt(talk.sec); }, 1000);
+}
+function talkClear() { talk.timers.forEach(clearTimeout); talk.timers = []; hush(); }
+function talkLeave() { talkClear(); clearInterval(talk.clock); }
+function setTalk(state) {
+  talk.state = state;
+  const o = $('.talk .orb'); if (!o) return;
+  o.className = 'orb ' + (talk.muted ? 'muted' : state);
+  const label = talk.muted ? 'Микрофон выключен' : { listening: 'Слушаю', thinking: 'Думаю', speaking: 'Говорю' }[state];
+  $('#talkStatus span').textContent = label;
+}
+function revealWords(el, text, speed, done) {
+  el.innerHTML = '';
+  const words = text.split(' ');
+  words.forEach((w, i) => talk.timers.push(setTimeout(() => {
+    const s = document.createElement('span'); s.className = 'w'; s.textContent = w; el.appendChild(s);
+    if (i === words.length - 1 && done) talk.timers.push(setTimeout(done, 900));
+  }, i * speed)));
+}
+function aiSay(text) {
+  setTalk('speaking');
+  st.chat.push({ role: 'ai', text, t: Date.now() }); save(); refreshHistory();
+  speak(text);
+  revealWords($('#talkReply'), text, RM ? 40 : 170, () => { if (talk.state === 'speaking') setTalk('listening'); });
+}
+function userSaid(text, typed) {
+  st.chat.push({ role: 'me', text, t: Date.now() }); save(); refreshHistory();
+  $('#talkSaid').textContent = (typed ? 'Ты написала: ' : 'Ты: ') + '«' + text + '»';
+}
+function orbTap() {
+  if (talk.muted) { toggleMic(); return; }
+  talkClear();
+  if (talk.state === 'listening') {
+    const s = SCRIPT[talk.step % SCRIPT.length];
+    userSaid(s.me, false);
+    setTalk('thinking');
+    $('#talkReply').innerHTML = '<span style="color:var(--ink3)">…</span>';
+  } else if (talk.state === 'thinking') {
+    const s = SCRIPT[talk.step % SCRIPT.length]; talk.step++;
+    aiSay(s.ai);
+  } else {
+    // перебиваем: дописываем реплику сразу и слушаем
+    const last = [...st.chat].reverse().find(m => m.role === 'ai');
+    if (last) $('#talkReply').textContent = last.text;
+    setTalk('listening');
+  }
+}
+function replyFor(text) {
+  const hit = REPLIES.find(r => r[0].test(text));
+  if (hit) return hit[1];
+  return DEFAULT_REPLIES[ui.replyIdx++ % DEFAULT_REPLIES.length];
+}
+function toggleMic() {
+  talk.muted = !talk.muted;
+  const b = $('#micBtn');
+  b.innerHTML = talk.muted ? I.micOff : I.mic;
+  b.classList.toggle('off', talk.muted);
+  b.setAttribute('aria-pressed', talk.muted);
+  b.setAttribute('aria-label', talk.muted ? 'Включить микрофон' : 'Выключить микрофон');
+  if (talk.muted) { talkClear(); }
+  setTalk(talk.muted ? talk.state : 'listening');
+  toast(talk.muted ? 'Микрофон выключен — нажми на сферу, чтобы вернуться' : 'Микрофон включён');
+}
+function historyHtml() {
+  return `<div class="sheet-head"><h2>Текст разговора</h2><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
+  <div id="historyList" style="margin-top:10px">${st.chat.length ? st.chat.map(m => `<div class="bubble ${m.role}">${esc(m.text)}<small>${m.role === 'ai' ? 'Lila' : 'Ты'} · ${when(m.t)}</small></div>`).join('') : '<div class="empty">Пока тихо. Нажми на сферу или напиши.</div>'}</div>
+  ${st.chat.length ? `<button class="btn ghost full" style="margin-top:12px" data-act="clear-chat">Очистить историю</button>` : ''}`;
+}
+function refreshHistory() { if (ui.sheet === 'history') { $('#sheetBody').innerHTML = historyHtml(); const s = $('.sheet'); s.scrollTop = s.scrollHeight; } }
+
+/* ---------- ИТОГИ НЕДЕЛИ ---------- */
+function renderWeek() {
+  const counts = CATS.map(c => ({ ...c, n: st.notes.filter(n => n.cat === c.id).length })).sort((a, b) => b.n - a.n);
+  const max = Math.max(1, ...counts.map(c => c.n));
+  const done = st.tasks.filter(t => t.done);
+  const stuck = st.tasks.filter(t => !t.done && t.date < todayIso());
+  const kept = st.promises.filter(p => p.status === 'done').length;
+  const later = st.promises.filter(p => p.status === 'later');
+  const top = counts[0];
+  const mon = mondayOf(new Date()), end = new Date(mon); end.setDate(end.getDate() + 6);
+  const sm = d => d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+  return `
+  <div class="topbar"><button class="icon-btn glass" data-act="go" data-screen="today" aria-label="Назад">${I.back}</button><span class="pill glass">${sm(mon)} — ${sm(end)}</span></div>
+  <div><h1 class="title">Итоги недели</h1>
+  <p class="summary">Эта неделя была про <span style="color:var(--accent)">${top.name}</span>: ${top.n} ${plural(top.n, ['мысль', 'мысли', 'мыслей'])}. Закрыто ${done.length} ${plural(done.length, ['задача', 'задачи', 'задач'])} — и это без героизма.</p></div>
+  <div class="stats">
+    <div class="stat glass"><b>${st.notes.length}</b><small>${plural(st.notes.length, ['мысль', 'мысли', 'мыслей'])} записано</small></div>
+    <div class="stat glass"><b>${done.length}</b><small>${plural(done.length, ['задача', 'задачи', 'задач'])} закрыто</small></div>
+    <div class="stat glass"><b>${kept}</b><small>${plural(kept, ['обещание', 'обещания', 'обещаний'])} сдержано</small></div>
+  </div>
+  <section class="card glass">
+    <p class="eyebrow">Что сделано</p>
+    ${done.length ? `<ul class="list">${done.slice(0, 5).map(t => `<li><i class="dotc" style="${cv(t.cat)}"></i><div>${esc(t.title)}<small>${catName(t.cat)}</small></div></li>`).join('')}${done.length > 5 ? `<li><div><small>и ещё ${done.length - 5}</small></div></li>` : ''}</ul>` : '<p class="sub" style="margin:0">Пока пусто — неделя только началась. Отметь задачу в «Фокусе дня».</p>'}
+  </section>
+  <section class="card glass">
+    <p class="eyebrow">Что застряло</p>
+    <ul class="list">
+      ${stuck.slice(0, 4).map(t => `<li><i class="dotc" style="${cv(t.cat)}"></i><div>${esc(t.title)}<small>с ${new Date(t.date + 'T00:00:00').toLocaleDateString('ru-RU', { weekday: 'long' }).replace(/а$/, 'у')} · ${catName(t.cat)}</small></div></li>`).join('')}
+      ${later.map(p => `<li><i class="dotc" style="--c:var(--danger)"></i><div>${esc(p.text)}<small>обещание отложено</small></div></li>`).join('')}
+      <li><i class="dotc" style="${cv('embroidery')}"></i><div>Название магазина вышивки<small>третью неделю без решения · Вышивка</small></div></li>
+    </ul>
+  </section>
+  <section class="card glass promise">
+    <p class="eyebrow">На что сделать фокус</p>
+    <ul class="list">
+      <li><i class="dotc" style="${cv('kedice')}"></i><div>Каппадокия → отправить Kedice на ревью<small>это откроет путь в App Store</small></div></li>
+      <li><i class="dotc" style="${cv('embroidery')}"></i><div>Выбрать название и сшить первый набор<small>«Тихий вечер» нравился больше всего</small></div></li>
+      <li><i class="dotc" style="${cv('personal')}"></i><div>Вечера без звонков — 5 из 7<small>на этой неделе получилось 2</small></div></li>
+    </ul>
+  </section>
+  <section class="card glass chart">
+    <p class="eyebrow">Мысли по категориям</p>
+    ${counts.map(c => `<div class="row"><span>${c.name}</span><div class="track2"><b style="${cv(c.id)}" data-pct="${Math.round(c.n / max * 100)}"></b></div><span class="num">${c.n}</span></div>`).join('')}
+  </section>
+  <button class="btn primary full" data-act="go" data-screen="talk">Обсудить неделю с Lila</button>`;
+}
+
+/* ================= БРИФ ================= */
+const brief = { playing: false, t: 0, timer: null };
+function briefUI() {
+  const bar = $('#briefBar'); if (!bar) return;
+  bar.style.width = (brief.t / BRIEF_LEN * 100) + '%';
+  $('#briefTime').textContent = `${fmt(brief.t)} / ${fmt(BRIEF_LEN)}`;
+  const idx = brief.playing || brief.t > 0 ? Math.min(2, Math.floor(brief.t / (BRIEF_LEN / 3))) : -1;
+  $$('#briefCard .brief-item').forEach((el, i) => el.classList.toggle('on', i === idx));
+  $('#briefBtn').innerHTML = brief.playing ? `${I.pause}<span>Пауза</span>` : `${I.play}<span>${brief.t > 0 ? 'Дальше' : 'Послушать'}</span>`;
+  $('#briefOrb').style.visibility = brief.playing ? 'visible' : 'hidden';
+}
+function toggleBrief() {
+  if (brief.playing) { brief.playing = false; clearInterval(brief.timer); hush(); briefUI(); return; }
+  if (brief.t >= BRIEF_LEN) brief.t = 0;
+  brief.playing = true;
+  speak(BRIEF.map(b => b.title + '. ' + b.text).join(' '));
+  brief.timer = setInterval(() => {
+    brief.t++;
+    if (brief.t >= BRIEF_LEN) { brief.playing = false; clearInterval(brief.timer); briefUI(); brief.t = 0; toast('Бриф прослушан. Хорошего дня, Алина'); setTimeout(briefUI, 600); return; }
+    briefUI();
+  }, 1000);
+  briefUI();
+}
+function stopBrief() { if (brief.playing) hush(); brief.playing = false; brief.t = 0; clearInterval(brief.timer); }
+
+/* ================= ГОЛОСОВЫЕ ЗАМЕТКИ ================= */
+const vn = { id: null, t: 0, timer: null };
+function stopVoiceNote() {
+  clearInterval(vn.timer);
+  if (vn.id) {
+    const b = $(`.play[data-id="${vn.id}"]`); if (b) { b.innerHTML = I.play; b.setAttribute('aria-label', 'Прослушать'); }
+    $$(`[data-wave="${vn.id}"] i`).forEach(i => i.classList.remove('on'));
+    const n = st.notes.find(x => x.id === vn.id), d = $(`[data-dur="${vn.id}"]`); if (d && n) d.textContent = fmt(n.dur);
+  }
+  vn.id = null; vn.t = 0;
+}
+function playNote(id) {
+  if (vn.id === id) { stopVoiceNote(); hush(); return; }
+  stopVoiceNote();
+  const n = st.notes.find(x => x.id === id); if (!n) return;
+  vn.id = id; vn.t = 0;
+  speak(n.text);
+  $$(`.play[data-id="${id}"]`).forEach(b => { b.innerHTML = I.pause; b.setAttribute('aria-label', 'Пауза'); });
+  const step = 0.25;
+  vn.timer = setInterval(() => {
+    vn.t += step;
+    const p = vn.t / n.dur;
+    $$(`[data-wave="${id}"]`).forEach(w => { const bars = w.children; for (let i = 0; i < bars.length; i++) bars[i].classList.toggle('on', i / bars.length < p); });
+    $$(`[data-dur="${id}"]`).forEach(d => d.textContent = fmt(Math.max(0, n.dur - vn.t)));
+    if (p >= 1) stopVoiceNote();
+  }, step * 1000);
+}
+
+/* ================= ЗАПИСЬ ================= */
+let rec = null;
+function openRecord() {
+  stopBrief(); stopVoiceNote(); if (ui.screen === 'talk') talkClear();
+  closeSheet();
+  let i; do { i = Math.floor(Math.random() * PHRASES.length); } while (i === ui.lastPhrase && PHRASES.length > 1);
+  ui.lastPhrase = i;
+  const ph = PHRASES[i];
+  rec = { phase: 'rec', sec: 0, wi: 0, ph, words: ph.text.split(' '), cat: ph.cat, tasks: ph.tasks.map(t => ({ title: t, on: true })), tags: 0, timers: [] };
+  const o = $('#rec'); o.classList.remove('closing'); o.classList.add('open');
+  renderRec();
+  rec.clock = setInterval(() => { if (rec && rec.phase === 'rec') { rec.sec++; const t = $('#recTime'); if (t) t.textContent = fmt(rec.sec); } }, 1000);
+  rec.wordT = setInterval(recWord, RM ? 90 : 270);
+}
+function recWord() {
+  if (!rec || rec.phase !== 'rec' || rec.wi >= rec.words.length) return;
+  const box = $('#recText'); if (!box) return;
+  if (rec.wi === 0) box.innerHTML = '';
+  $$('.w.fresh', box).forEach((w, i, a) => { if (i < a.length - 2) w.classList.remove('fresh'); });
+  const s = document.createElement('span'); s.className = 'w fresh'; s.textContent = rec.words[rec.wi]; box.appendChild(s);
+  rec.wi++;
+  const p = rec.wi / rec.words.length;
+  const tags = $('#recTags');
+  const add = html => { tags.insertAdjacentHTML('beforeend', html); rec.tags++; };
+  if (p > .3 && rec.tags === 0) add(`<span class="tag glass" style="${cv(rec.cat)}"><em>Категория</em><i class="dotc"></i>${catName(rec.cat)}</span>`);
+  if (p > .6 && rec.tags === 1) add(`<span class="tag glass"><em>Тип</em>${esc(rec.ph.type)}</span>`);
+  if (p > .85 && rec.tags === 2) add(`<span class="tag glass">${I.flag}<em>Задача</em>${esc(rec.ph.tasks[0])}</span>`);
+  if (rec.wi >= rec.words.length) { $$('.w.fresh', box).forEach(w => w.classList.remove('fresh')); const st2 = $('#recStatus'); if (st2) st2.textContent = 'Слушаю… нажми стоп, когда закончишь'; }
+}
+function recScreen() {
+  return `<div class="rec">
+    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Отменить запись">${I.x}</button><span class="status" style="height:auto"><i></i><span id="recStatus">Слушаю…</span></span><span style="width:44px"></span></div>
+    <div class="rec-time" id="recTime">${fmt(rec.sec)}</div>
+    <div class="orb-halo">${orb('listening', 190)}</div>
+    <p class="rec-text" id="recText"><span class="ph">Говори, я записываю…</span></p>
+    <div class="rec-tags" id="recTags"></div>
+    <div class="rec-ctrl">
+      <div><button class="cbtn glass" data-act="rec-pause" id="pauseBtn" aria-label="Пауза">${I.pause}</button><small id="pauseLbl">Пауза</small></div>
+      <div><button class="cbtn stop" data-act="rec-stop" aria-label="Остановить и разобрать">${I.stop}</button><small>Стоп</small></div>
+      <div><button class="cbtn glass" data-act="rec-cancel" aria-label="Отменить">${I.x}</button><small>Отмена</small></div>
+    </div>
+  </div>`;
+}
+function resultScreen() {
+  const n = rec.tasks.filter(t => t.on).length;
+  return `<div class="rec">
+    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Не сохранять">${I.x}</button><span class="pill glass">Запись ${fmt(Math.max(rec.sec, 1))}</span><span style="width:44px"></span></div>
+    <div class="result">
+      <p class="eyebrow">Мысль разобрана</p>
+      <h2>${esc(rec.ph.title)}</h2>
+      <section class="card glass">
+        <p class="eyebrow">Категория и тип</p>
+        <div class="chiprow" id="resCat">${catChip(rec.cat)}<span class="chip">${esc(rec.ph.type)}</span></div>
+        <p class="quote">«${esc(rec.ph.text)}»</p>
+      </section>
+      <section class="card glass">
+        <div class="brief-head" style="margin:0"><p class="eyebrow" style="margin:0">Нашла ${rec.tasks.length} ${plural(rec.tasks.length, ['задачу', 'задачи', 'задач'])}</p><span class="counter">в План: ${n}</span></div>
+        ${rec.tasks.map((t, i) => `<button class="task ${t.on ? 'done' : ''}" data-act="rec-task" data-i="${i}" aria-pressed="${t.on}" style="text-decoration:none"><span class="box">${I.check}</span><span class="t" style="color:var(--ink);text-decoration:none">${esc(t.title)}<span class="meta">${t.on ? 'добавлю в План на сегодня' : 'не добавлять'}</span></span></button>`).join('')}
+      </section>
+      <div class="btn-row"><button class="btn primary" data-act="rec-save">${I.checkIco}Сохранить</button><button class="btn ghost" data-act="rec-cat">Изменить категорию</button></div>
+    </div>
+  </div>`;
+}
+function renderRec() {
+  const o = $('#rec');
+  if (rec.phase === 'rec' || rec.phase === 'paused') o.innerHTML = recScreen();
+  else if (rec.phase === 'processing') o.innerHTML = `<div class="rec"><div class="processing">
+      <div class="orb-halo">${orb('thinking', 150)}</div>
+      <div class="serif">Разбираю мысль…</div>
+      <div class="steps"><div id="s1">${I.check}Расшифровка</div><div id="s2">${I.check}Категория</div><div id="s3">${I.check}Задачи и сроки</div></div>
+    </div></div>`;
+  else o.innerHTML = resultScreen();
+}
+function recPause() {
+  if (rec.phase === 'rec') {
+    rec.phase = 'paused';
+    $('#rec .orb').className = 'orb paused';
+    $('#pauseBtn').innerHTML = I.mic; $('#pauseBtn').setAttribute('aria-label', 'Продолжить'); $('#pauseLbl').textContent = 'Дальше';
+    $('#recStatus').textContent = 'Пауза';
+  } else if (rec.phase === 'paused') {
+    rec.phase = 'rec';
+    $('#rec .orb').className = 'orb listening';
+    $('#pauseBtn').innerHTML = I.pause; $('#pauseBtn').setAttribute('aria-label', 'Пауза'); $('#pauseLbl').textContent = 'Пауза';
+    $('#recStatus').textContent = 'Слушаю…';
+  }
+}
+function recStop() {
+  clearInterval(rec.clock); clearInterval(rec.wordT);
+  rec.phase = 'processing'; renderRec();
+  const r = rec;
+  [[500, 's1'], [1100, 's2'], [1700, 's3']].forEach(([ms, id]) => r.timers.push(setTimeout(() => { const e = $('#' + id); if (e) e.classList.add('ok'); }, ms)));
+  r.timers.push(setTimeout(() => { if (rec === r) { rec.phase = 'result'; renderRec(); } }, 2100));
+}
+function closeRecord() {
+  if (!rec) return;
+  clearInterval(rec.clock); clearInterval(rec.wordT); rec.timers.forEach(clearTimeout);
+  rec = null;
+  const o = $('#rec'); o.classList.add('closing');
+  setTimeout(() => { o.classList.remove('open', 'closing'); o.innerHTML = ''; }, RM ? 0 : 340);
+}
+function recSave() {
+  const id = 'n' + uid();
+  st.notes.unshift({ id, cat: rec.cat, type: 'voice', dur: Math.max(rec.sec, 4), created: Date.now(), title: rec.ph.title, text: rec.ph.text });
+  const added = rec.tasks.filter(t => t.on);
+  added.forEach(t => st.tasks.push({ id: uid(), title: t.title, cat: rec.cat, date: todayIso(), done: false, focus: false, noteId: id }));
+  save();
+  closeRecord();
+  ui.filter = 'all'; ui.q = ''; ui.fresh = id;
+  if (ui.screen === 'thoughts') render(true); else go('thoughts');
+  toast(`Сохранено в «Мысли»${added.length ? ` · ${added.length} ${plural(added.length, ['задача', 'задачи', 'задач'])} в Плане` : ''}`, { label: 'В План', fn: () => { ui.planDay = todayWd(); go('plan'); } });
+}
+
+/* ================= ШТОРКА ================= */
+function openSheet(html, kind) {
+  ui.sheet = kind;
+  $('#sheetBody').innerHTML = html;
+  $('.sheet').scrollTop = 0;
+  $('#sheetWrap').classList.add('open');
+}
+function closeSheet() { $('#sheetWrap').classList.remove('open'); ui.sheet = null; ui.sheetNote = null; }
+
+function noteSheet(id, confirmDel) {
+  const n = st.notes.find(x => x.id === id); if (!n) return closeSheet();
+  ui.sheetNote = id;
+  const tasks = st.tasks.filter(t => t.noteId === id);
+  const html = `<div class="sheet-head"><div class="chiprow">${catChip(n.cat)}<span class="chip">${TYPES[n.type]}</span></div><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
+    <h2>${esc(n.title)}</h2>
+    <p class="meta">${when(n.created)}${n.type === 'voice' ? ` · голосовая, ${fmt(n.dur)}` : ''}</p>
+    ${n.type === 'voice' ? `<div class="vpill" style="margin-top:12px"><button class="play" data-act="play-note" data-id="${n.id}" aria-label="Прослушать">${I.play}</button><div class="wave" data-wave="${n.id}">${waveBars(n.id, 44)}</div><span class="dur" data-dur="${n.id}">${fmt(n.dur)}</span></div>` : ''}
+    ${n.type === 'numbers' ? `<div class="note numbers" style="min-height:0;padding:14px 0 0"><div class="big">${esc(n.big)}</div></div>` : ''}
+    <p class="full ${n.type === 'reflection' ? 'serif' : ''}" ${n.type === 'reflection' ? 'style="font-size:26px;line-height:1.15"' : ''}>${n.type === 'reflection' ? '«' + esc(n.text) + '»' : esc(n.text)}</p>
+    <h4>Связанные задачи</h4>
+    ${tasks.length ? tasks.map(t => taskRow(t, { meta: false })).join('') : '<p class="meta" style="margin:6px 0 0">Пока нет задач из этой мысли.</p>'}
+    <div class="btn-row">
+      <button class="btn primary" data-act="make-task" data-id="${n.id}">${I.plus}Сделать задачей</button>
+      <button class="btn danger" data-act="del-ask" data-id="${n.id}">${I.trash}Удалить</button>
+    </div>
+    ${confirmDel ? `<div class="confirm"><p>Удалить мысль насовсем?</p><div class="btn-row" style="margin:0"><button class="btn danger" data-act="del-yes" data-id="${n.id}" style="background:var(--danger);color:#fff">Удалить</button><button class="btn ghost" data-act="del-no" data-id="${n.id}">Оставить</button></div></div>` : ''}`;
+  if (ui.sheet === 'note') { $('#sheetBody').innerHTML = html; if (confirmDel) { const s = $('.sheet'); s.scrollTo({ top: s.scrollHeight, behavior: 'smooth' }); } }
+  else openSheet(html, 'note');
+}
+function catSheet() {
+  openSheet(`<div class="sheet-head"><h2>Категория</h2><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
+    <p class="meta" style="margin:0 0 10px">Я предложила «${catName(rec.ph.cat)}». Можно поменять.</p>
+    <div class="cat-list">${CATS.map(c => `<button class="${rec.cat === c.id ? 'on' : ''}" data-act="pick-cat" data-cat="${c.id}"><i class="dotc" style="${cv(c.id)}"></i>${c.name}${rec.cat === c.id ? I.checkIco : ''}</button>`).join('')}</div>`, 'cat');
+}
+function settingsHtml(confirmReset) {
+  return `<div class="sheet-head"><h2>Настройки</h2><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
+  <p class="eyebrow" style="margin-top:12px">Оформление</p>
+  <div class="seg">
+    <button class="${st.theme === 'light' ? 'on' : ''}" data-act="theme" data-theme="light" aria-pressed="${st.theme === 'light'}"><div class="swatch light"></div><span>Дымка</span><small>светлая, розово-лавандовая</small></button>
+    <button class="${st.theme === 'dark' ? 'on' : ''}" data-act="theme" data-theme="dark" aria-pressed="${st.theme === 'dark'}"><div class="swatch dark"></div><span>Болото</span><small>тёмная, мох и ореховый</small></button>
+  </div>
+  <div class="set-row"><div><b>Озвучивать ответы</b><small>${ruVoice ? 'голосом браузера: ' + esc(ruVoice.name) : 'в этом браузере нет русского голоса — только анимация'}</small></div><button class="switch-hit" data-act="toggle-voice" role="switch" aria-checked="${st.voice}" aria-label="Озвучивать ответы"><span class="switch ${st.voice ? 'on' : ''}"></span></button></div>
+  <div class="set-row"><div><b>Имя</b><small>как Lila обращается к тебе</small></div><span>Алина</span></div>
+  <div class="set-row" style="border:0"><div><b>Данные</b><small>${st.notes.length} ${plural(st.notes.length, ['мысль', 'мысли', 'мыслей'])}, ${st.tasks.length} ${plural(st.tasks.length, ['задача', 'задачи', 'задач'])} · хранятся только в этом браузере</small></div></div>
+  <button class="btn ghost full" data-act="reset-ask">Сбросить демо-данные</button>
+  ${confirmReset ? `<div class="confirm"><p>Вернуть всё как было в начале? Новые мысли и отметки пропадут.</p><div class="btn-row" style="margin:0"><button class="btn danger" data-act="reset-yes" style="background:var(--danger);color:#fff">Сбросить</button><button class="btn ghost" data-act="reset-no">Отмена</button></div></div>` : ''}
+  <p class="meta" style="text-align:center;margin-top:18px">Lila · кликабельный прототип</p>`;
+}
+function applyTheme() {
+  document.documentElement.dataset.theme = st.theme;
+  $('meta[name="theme-color"]').content = st.theme === 'dark' ? '#161B13' : '#F7F2FB';
+}
+
+/* ================= ТОСТ ================= */
+let toastT, toastFn;
+function toast(msg, action) {
+  const t = $('#toast');
+  t.innerHTML = `<span>${esc(msg)}</span>${action ? `<button data-act="toast-action">${esc(action.label)}</button>` : ''}`;
+  toastFn = action ? action.fn : null;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), action ? 5000 : 2800);
+}
+
+/* ================= ДЕЙСТВИЯ ================= */
+function findTask(id) { return st.tasks.find(t => t.id === id); }
+const A = {
+  'go': el => { closeSheet(); go(el.dataset.screen); },
+  'record': () => openRecord(),
+  'open-settings': () => openSheet(settingsHtml(), 'settings'),
+  'close-sheet': () => { if (ui.sheet === 'note') stopVoiceNote(); closeSheet(); },
+  'brief': () => toggleBrief(),
+  'toggle-task': el => {
+    const t = findTask(el.dataset.id); if (!t) return;
+    t.done = !t.done; save(); ui.pop = t.id;
+    if (t.done && navigator.vibrate) try { navigator.vibrate(12); } catch (e) { }
+    if (ui.sheet === 'note') { noteSheet(ui.sheetNote); render(false); return; }
+    render(false);
+    if (t.done && ui.screen === 'today' && focusTasks().every(x => x.done)) toast('Фокус дня закрыт. Ты молодец');
+  },
+  'promise-done': el => {
+    const p = st.promises.find(x => x.id === el.dataset.id);
+    $('#promiseCard').classList.add('leaving');
+    setTimeout(() => { p.status = 'done'; save(); render(false); toast('Отмечено. Слово сдержано'); }, RM ? 0 : 380);
+  },
+  'promise-later': el => {
+    const p = st.promises.find(x => x.id === el.dataset.id);
+    $('#promiseCard').classList.add('leaving');
+    setTimeout(() => { p.status = 'later'; save(); render(false); toast('Напомню сегодня в 19:45'); }, RM ? 0 : 380);
+  },
+  'promise-back': () => { st.promises.forEach(p => { if (p.status === 'later') p.status = 'open'; }); save(); render(false); },
+  'filter': el => { ui.filter = el.dataset.cat; $$('.chips .chip-btn').forEach(b => b.classList.toggle('on', b === el)); refreshThoughtList(); },
+  'clear-search': () => { ui.q = ''; const i = $('#search'); i.value = ''; i.focus(); $('#clearSearch').style.visibility = 'hidden'; refreshThoughtList(); },
+  'clear-filters': () => { ui.q = ''; ui.filter = 'all'; render(false); },
+  'open-note': el => noteSheet(el.dataset.id),
+  'play-note': el => playNote(el.dataset.id),
+  'make-task': el => {
+    const n = st.notes.find(x => x.id === el.dataset.id);
+    const title = n.type === 'reflection' ? 'Подумать: ' + n.title : n.title;
+    st.tasks.push({ id: uid(), title, cat: n.cat, date: todayIso(), done: false, focus: false, noteId: n.id });
+    save(); noteSheet(n.id); render(false);
+    toast('Задача добавлена в План на сегодня', { label: 'Открыть', fn: () => { closeSheet(); ui.planDay = todayWd(); go('plan'); } });
+  },
+  'del-ask': el => noteSheet(el.dataset.id, true),
+  'del-no': el => noteSheet(el.dataset.id),
+  'del-yes': el => {
+    const idx = st.notes.findIndex(x => x.id === el.dataset.id); if (idx < 0) return;
+    stopVoiceNote();
+    const [removed] = st.notes.splice(idx, 1); save(); closeSheet(); render(false);
+    toast('Мысль удалена', { label: 'Вернуть', fn: () => { st.notes.splice(idx, 0, removed); save(); render(false); } });
+  },
+  'pick-day': el => { ui.planDay = +el.dataset.i; render(false); },
+  'toggle-goal': el => { const id = el.dataset.id; ui.openGoals.has(id) ? ui.openGoals.delete(id) : ui.openGoals.add(id); render(false); },
+  'toggle-step': el => {
+    const g = st.goals.find(x => x.id === el.dataset.goal), s = g.steps.find(x => x.id === el.dataset.id);
+    s.done = !s.done; save(); ui.pop = s.id; render(false);
+    if (g.steps.every(x => x.done)) toast(`Цель «${g.title}» достигнута!`);
+  },
+  'idea-to-plan': el => {
+    const i = st.ideas.find(x => x.id === el.dataset.id);
+    const dayName = d => d.toLocaleDateString('ru-RU', { weekday: 'long' }).replace(/а$/, 'у');
+    if (i.added) { const t = findTask(i.task); toast(t ? `Уже в плане на ${dayName(new Date(t.date + 'T00:00:00'))}` : 'Уже в плане'); return; }
+    const d = dateOfWd(ui.planDay), tid = uid();
+    st.tasks.push({ id: tid, title: 'Рилс: ' + i.title, cat: 'content', date: iso(d), done: false, focus: false, noteId: i.note });
+    i.added = true; i.task = tid; save(); render(false);
+    toast(`Добавила в план на ${ui.planDay === todayWd() ? 'сегодня' : dayName(d)}`);
+  },
+  'orb-tap': () => orbTap(),
+  'mic': () => toggleMic(),
+  'end-call': () => {
+    const sec = talk.sec, n = st.chat.filter(m => m.t > Date.now() - (sec + 1) * 1000).length;
+    talkLeave(); closeSheet();
+    ui.screen = 'today'; render(true);
+    toast(`Разговор сохранён · ${fmt(sec)}${n ? ` · ${n} ${plural(n, ['реплика', 'реплики', 'реплик'])}` : ''}`);
+  },
+  'open-history': () => { openSheet(historyHtml(), 'history'); const s = $('.sheet'); s.scrollTop = s.scrollHeight; },
+  'clear-chat': () => { st.chat = []; save(); refreshHistory(); toast('История очищена'); },
+  'rec-pause': () => recPause(),
+  'rec-stop': () => recStop(),
+  'rec-cancel': () => { const wasResult = rec && rec.phase === 'result'; closeRecord(); toast(wasResult ? 'Мысль не сохранена' : 'Запись отменена'); },
+  'rec-task': el => { const t = rec.tasks[+el.dataset.i]; t.on = !t.on; renderRec(); },
+  'rec-cat': () => catSheet(),
+  'pick-cat': el => { rec.cat = el.dataset.cat; closeSheet(); renderRec(); toast(`Категория: ${catName(rec.cat)}`); },
+  'rec-save': () => recSave(),
+  'theme': el => { st.theme = el.dataset.theme; save(); applyTheme(); $('#sheetBody').innerHTML = settingsHtml(); },
+  'toggle-voice': () => { st.voice = !st.voice; save(); if (!st.voice) hush(); $('#sheetBody').innerHTML = settingsHtml(); },
+  'reset-ask': () => { $('#sheetBody').innerHTML = settingsHtml(true); const s = $('.sheet'); s.scrollTo({ top: s.scrollHeight, behavior: 'smooth' }); },
+  'reset-no': () => { $('#sheetBody').innerHTML = settingsHtml(); },
+  'reset-yes': () => {
+    stopBrief(); stopVoiceNote(); talkLeave();
+    const theme = st.theme;
+    try { localStorage.removeItem(KEY); } catch (e) { }
+    st = seed(); st.theme = theme; save();
+    Object.assign(ui, { screen: 'today', filter: 'all', q: '', planDay: todayWd(), fresh: null, goalPrev: {} }); ui.openGoals.clear();
+    closeSheet(); render(true); toast('Демо-данные восстановлены');
+  },
+  'toast-action': () => { $('#toast').classList.remove('show'); if (toastFn) { const f = toastFn; toastFn = null; f(); } },
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || !A[el.dataset.act]) return;
+  e.preventDefault();
+  A[el.dataset.act](el, e);
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { if (ui.sheet) closeSheet(); else if (rec) { closeRecord(); toast('Запись отменена'); } }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('article[data-act]')) { e.preventDefault(); A[e.target.dataset.act](e.target); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'search') { ui.q = e.target.value; $('#clearSearch').style.visibility = ui.q ? 'visible' : 'hidden'; refreshThoughtList(); }
+});
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'writeForm') return;
+  e.preventDefault();
+  const inp = $('#writeInput'), text = inp.value.trim();
+  if (!text) { inp.focus(); toast('Напиши пару слов'); return; }
+  inp.value = '';
+  if (talk.muted) toggleMic();
+  talkClear();
+  userSaid(text, true);
+  setTalk('thinking');
+  $('#talkReply').innerHTML = '<span style="color:var(--ink3)">…</span>';
+  talk.timers.push(setTimeout(() => aiSay(replyFor(text)), 1000));
+});
+
+/* ================= РАМКА ТЕЛЕФОНА ================= */
+function fit() {
+  const d = $('#device');
+  if (innerWidth >= 600 && innerHeight >= 560) {
+    const s = Math.min(1, (innerHeight - 48) / 868, (innerWidth - 48) / 414);
+    d.style.transform = s < 1 ? `scale(${s})` : '';
+  } else d.style.transform = '';
+}
+function clock() { const n = new Date(); $('#sbTime').textContent = `${n.getHours()}:${pad(n.getMinutes())}`; }
+addEventListener('resize', fit);
+
+/* ================= СТАРТ ================= */
+load();
+applyTheme();
+fit(); clock(); setInterval(clock, 20000);
+render(true);
+</script>
+</body>
+</html>
