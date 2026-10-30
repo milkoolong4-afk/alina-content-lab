@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F7F2FB">
 <title>Lila</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Lila">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
@@ -345,6 +352,7 @@ h1.title { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size
 @keyframes think { 0%, 100% { transform: scale(1) rotate(0); filter: brightness(1); } 50% { transform: scale(.96) rotate(8deg); filter: brightness(1.1); } }
 .orb.speaking { --spd: 2.2s; animation: speak .8s ease-in-out infinite; filter: saturate(1.3); }
 @keyframes speak { 0%, 100% { transform: scale(1); } 25% { transform: scale(1.06); } 55% { transform: scale(.98); } 80% { transform: scale(1.04); } }
+.orb.live { animation: none; --spd: 6s; transform: scale(var(--lvl, 1)); transition: transform .09s linear, filter .5s; }
 .orb.paused, .orb.muted { animation: none; filter: grayscale(.45) opacity(.75); }
 .orb.paused .b, .orb.muted .b { animation-play-state: paused; }
 
@@ -373,6 +381,11 @@ h1.title { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size
 .rec-time { font-family: "Cormorant Garamond", serif; font-size: 40px; font-variant-numeric: tabular-nums; margin: 2px 0 14px; }
 .rec-text { font-family: "Cormorant Garamond", serif; font-size: 25px; line-height: 1.18; text-align: center; min-height: 120px; max-width: 340px; margin: 26px 0 8px; }
 .rec-text .ph { color: var(--ink3); font-style: italic; }
+.rec-note { min-height: 18px; margin: 0 0 8px; font-size: 12px; color: var(--ink3); text-align: center; max-width: 300px; }
+.chip.pending { align-self: flex-start; background: color-mix(in srgb, var(--cat-content) 26%, transparent); }
+.chip.pending::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--cat-content); animation: blink 1.4s infinite; }
+.cbtn:disabled { opacity: .4; pointer-events: none; }
+.noscript { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; text-align: center; background: #F7F2FB; color: #2B2340; font: 16px/1.5 Inter, sans-serif; z-index: 999; }
 .rec-tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 72px; align-content: flex-start; max-width: 340px; }
 .tag { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; animation: tagin .5s cubic-bezier(.3,1.5,.5,1) both; }
 .tag em { font-style: normal; color: var(--ink3); }
@@ -463,6 +476,7 @@ h1.title { font-family: "Cormorant Garamond", serif; font-weight: 500; font-size
 </style>
 </head>
 <body>
+<noscript><div class="noscript">Lila не запустилась: в этом режиме просмотра выключен JavaScript.<br>Открой ссылку в Safari или Chrome.</div></noscript>
 <div class="device" id="device">
   <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="statusbar" aria-hidden="true">
@@ -660,12 +674,39 @@ const DEFAULT_REPLIES = [
   'Записала. Хочешь, сделаю из этого задачу на завтра?',
 ];
 
-/* ================= СОСТОЯНИЕ ================= */
+/* ================= СОСТОЯНИЕ (IndexedDB, запасной вариант — localStorage) ================= */
 const KEY = 'lila-demo-v1';
+const DB = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    if (!('indexedDB' in window)) return rej(new Error('IndexedDB недоступна'));
+    const r = indexedDB.open('lila', 1);
+    r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('audio'); };
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  }).catch(e => { dbp = null; throw e; }));
+  const tx = async (store, mode, fn) => {
+    const d = await open();
+    return new Promise((res, rej) => {
+      const t = d.transaction(store, mode), req = fn(t.objectStore(store));
+      t.oncomplete = () => res(req && req.result);
+      t.onerror = t.onabort = () => rej(t.error);
+    });
+  };
+  return {
+    get: (s, k) => tx(s, 'readonly', o => o.get(k)),
+    put: (s, k, v) => tx(s, 'readwrite', o => o.put(v, k)),
+    del: (s, k) => tx(s, 'readwrite', o => o.delete(k)),
+    clear: s => tx(s, 'readwrite', o => o.clear()),
+    count: s => tx(s, 'readonly', o => o.count()),
+  };
+})();
 let st;
-function load() {
-  try { st = JSON.parse(localStorage.getItem(KEY)); } catch (e) { st = null; }
-  if (!st || st.v !== 1 || !Array.isArray(st.notes)) st = seed();
+async function load() {
+  let data = null;
+  try { data = await DB.get('kv', 'state'); ui.storage = 'idb'; } catch (e) { ui.storage = 'local'; }
+  if (!data) { try { data = JSON.parse(localStorage.getItem(KEY)); } catch (e) { data = null; } }
+  st = data && data.v === 1 && Array.isArray(data.notes) ? data : seed();
   // сдвигаем демо-неделю на текущую, чтобы план не устаревал
   const mon = mondayOf(new Date()), cur = iso(mon);
   if (st.weekStart !== cur) {
@@ -675,9 +716,13 @@ function load() {
   }
   save();
 }
-function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* приватный режим */ } }
+function saveLocal() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) { /* приватный режим */ } }
+function save() {
+  if (ui.storage === 'idb') DB.put('kv', 'state', st).catch(() => { ui.storage = 'local'; saveLocal(); });
+  else saveLocal();
+}
 
-const ui = { screen: 'today', filter: 'all', q: '', planDay: todayWd(), openGoals: new Set(), fresh: null, pop: null, sheet: null, goalPrev: {}, lastPhrase: -1, replyIdx: 0 };
+const ui = { screen: 'today', filter: 'all', q: '', planDay: todayWd(), openGoals: new Set(), fresh: null, pop: null, sheet: null, goalPrev: {}, lastPhrase: -1, replyIdx: 0, storage: 'idb', swReady: false, pendingStatus: null };
 
 /* ================= ГОЛОС (если в системе есть русский голос) ================= */
 let ruVoice = null;
@@ -801,8 +846,9 @@ function noteCard(n) {
   const base = `class="card glass note ${n.type}${n.type === 'voice' ? ' wide' : ''}${fresh}" style="${cv(n.cat)}" data-act="open-note" data-id="${n.id}" role="button" tabindex="0" aria-label="${esc(n.title)}"`;
   const top = `<div class="ntop">${catChip(n.cat)}<span class="time">${when(n.created)}</span></div>`;
   if (n.type === 'voice') return `<article ${base}>${top}<h3>${esc(n.title)}</h3>
+    ${n.pending ? `<span class="chip pending" data-pstatus="${n.id}">${ui.pendingStatus || 'Ждёт разбора'}</span>` : ''}
     <div class="vpill"><button class="play" data-act="play-note" data-id="${n.id}" aria-label="Прослушать">${I.play}</button><div class="wave" data-wave="${n.id}">${waveBars(n.id)}</div><span class="dur" data-dur="${n.id}">${fmt(n.dur)}</span></div>
-    <p class="clamp">${esc(n.text)}</p></article>`;
+    <p class="clamp">${n.pending ? 'Голос сохранён, текст появится после разбора.' : esc(n.text)}</p></article>`;
   if (n.type === 'idea') return `<article ${base}>${top}<span class="lbl">${I.spark}Идея</span><h3>${esc(n.title)}</h3><p class="clamp">${esc(n.text)}</p></article>`;
   if (n.type === 'reflection') return `<article ${base}>${top}<q>${esc(n.text)}</q></article>`;
   return `<article ${base}>${top}<h3>${esc(n.title)}</h3><div class="big">${esc(n.big)}</div><ul>${n.lines.map(l => `<li><span>${esc(l[0])}</span><b>${esc(l[1])}</b></li>`).join('')}</ul></article>`;
@@ -818,10 +864,10 @@ function thoughtList() {
   return list.map(noteCard).join('');
 }
 function renderThoughts() {
-  const todayN = st.notes.filter(n => isToday(n.created)).length;
+  const todayN = st.notes.filter(n => isToday(n.created)).length, pendN = st.notes.filter(n => n.pending).length;
   return `
   <div class="topbar"><div class="brand"><span class="dot"></span>Lila</div><button class="icon-btn glass" data-act="open-settings" aria-label="Настройки">${I.gear}</button></div>
-  <div><h1 class="title">Мысли</h1><p class="sub" id="thCount">Сегодня ${todayN} ${plural(todayN, ['мысль', 'мысли', 'мыслей'])} · всего ${st.notes.length}</p></div>
+  <div><h1 class="title">Мысли</h1><p class="sub" id="thCount">Сегодня ${todayN} ${plural(todayN, ['мысль', 'мысли', 'мыслей'])} · всего ${st.notes.length}${pendN ? ` · ${pendN} ${plural(pendN, ['ждёт', 'ждут', 'ждут'])} разбора` : ''}</p></div>
   <label class="search glass">${I.search}<span class="sr">Поиск</span><input id="search" type="text" enterkeyhint="search" placeholder="Найти мысль…" value="${esc(ui.q)}" autocomplete="off"><button class="icon-btn" data-act="clear-search" id="clearSearch" aria-label="Очистить поиск" style="${ui.q ? '' : 'visibility:hidden'}">${I.x}</button></label>
   <div class="chips" role="tablist">
     <button class="chip-btn ${ui.filter === 'all' ? 'on' : ''}" data-act="filter" data-cat="all">Все</button>
@@ -1040,100 +1086,302 @@ function toggleBrief() {
 function stopBrief() { if (brief.playing) hush(); brief.playing = false; brief.t = 0; clearInterval(brief.timer); }
 
 /* ================= ГОЛОСОВЫЕ ЗАМЕТКИ ================= */
-const vn = { id: null, t: 0, timer: null };
+const vn = { id: null, t: 0, timer: null, audio: null, url: null, dur: 0 };
 function stopVoiceNote() {
   clearInterval(vn.timer);
+  if (vn.audio) { try { vn.audio.pause(); } catch (e) { } vn.audio = null; }
+  if (vn.url) { URL.revokeObjectURL(vn.url); vn.url = null; }
   if (vn.id) {
-    const b = $(`.play[data-id="${vn.id}"]`); if (b) { b.innerHTML = I.play; b.setAttribute('aria-label', 'Прослушать'); }
+    $$(`.play[data-id="${vn.id}"]`).forEach(b => { b.innerHTML = I.play; b.setAttribute('aria-label', 'Прослушать'); });
     $$(`[data-wave="${vn.id}"] i`).forEach(i => i.classList.remove('on'));
-    const n = st.notes.find(x => x.id === vn.id), d = $(`[data-dur="${vn.id}"]`); if (d && n) d.textContent = fmt(n.dur);
+    $$(`[data-dur="${vn.id}"]`).forEach(d => d.textContent = fmt(vn.dur || 0));
   }
   vn.id = null; vn.t = 0;
 }
-function playNote(id) {
+function paintWave(id, p, left) {
+  $$(`[data-wave="${id}"]`).forEach(w => { const bars = w.children; for (let i = 0; i < bars.length; i++) bars[i].classList.toggle('on', i / bars.length < p); });
+  $$(`[data-dur="${id}"]`).forEach(d => d.textContent = fmt(Math.max(0, left)));
+}
+async function playNote(id) {
   if (vn.id === id) { stopVoiceNote(); hush(); return; }
-  stopVoiceNote();
-  const n = st.notes.find(x => x.id === id); if (!n) return;
-  vn.id = id; vn.t = 0;
-  speak(n.text);
+  stopVoiceNote(); hush();
+  let blob = null, dur = 0, text = '';
+  if (id === 'rec') { blob = rec && rec.blob; dur = rec ? rec.sec : 0; }
+  else {
+    const n = st.notes.find(x => x.id === id); if (!n) return;
+    dur = n.dur; text = n.text;
+    if (n.audio) { try { blob = await DB.get('audio', id); } catch (e) { } if (!blob) { toast('Аудио этой записи не найдено'); return; } }
+  }
+  vn.id = id; vn.dur = dur; vn.t = 0;
   $$(`.play[data-id="${id}"]`).forEach(b => { b.innerHTML = I.pause; b.setAttribute('aria-label', 'Пауза'); });
-  const step = 0.25;
-  vn.timer = setInterval(() => {
-    vn.t += step;
-    const p = vn.t / n.dur;
-    $$(`[data-wave="${id}"]`).forEach(w => { const bars = w.children; for (let i = 0; i < bars.length; i++) bars[i].classList.toggle('on', i / bars.length < p); });
-    $$(`[data-dur="${id}"]`).forEach(d => d.textContent = fmt(Math.max(0, n.dur - vn.t)));
-    if (p >= 1) stopVoiceNote();
-  }, step * 1000);
+  if (blob) {
+    vn.url = URL.createObjectURL(blob);
+    const a = new Audio(vn.url); vn.audio = a;
+    a.onended = () => { if (vn.audio === a) stopVoiceNote(); };
+    vn.timer = setInterval(() => { const total = isFinite(a.duration) && a.duration > 0 ? a.duration : Math.max(dur, 1); paintWave(id, a.currentTime / total, total - a.currentTime); }, 150);
+    a.play().catch(() => { if (vn.audio === a) { stopVoiceNote(); toast('Не получилось воспроизвести запись'); } });
+    return;
+  }
+  // у демо-заметок нет аудио — показываем воспроизведение и читаем текст голосом браузера
+  speak(text);
+  const step = .25;
+  vn.timer = setInterval(() => { vn.t += step; paintWave(id, vn.t / dur, dur - vn.t); if (vn.t >= dur) stopVoiceNote(); }, step * 1000);
+}
+
+/* ================= РАЗБОР ТЕКСТА: категория, тип, задачи ================= */
+const KW = {
+  kedice: ['kedice', 'кедис', 'турец', 'урок', 'каппадок', 'стамбул', 'карточк', 'app store', 'эпп стор', 'приложени'],
+  embroidery: ['вышив', 'магазин', 'нитк', 'мулине', 'пяльц', 'канв', 'набор', 'стеж', 'схем'],
+  travel: ['билет', 'поездк', 'путешеств', 'сидне', 'мендос', 'сантьяго', 'таиланд', 'патагон', 'итали', 'япони', 'отел', 'перелет', 'виз', 'лететь', 'полет', 'маршрут'],
+  content: ['рилс', 'reels', 'видео', 'монтаж', 'эпизод', 'блог', 'контент', 'сторис', 'сценари', 'ролик', 'тикток', 'подписчик'],
+  lila: ['lila', 'лила', 'лилу', 'джарвис', 'ассистент', 'прототип', 'промпт'],
+  personal: ['тренировк', 'спорт', 'звон', 'позвон', 'созвон', 'спать', 'выспат', 'здоров', 'мама', 'папа', 'устал', 'отдых', 'вечер'],
+};
+const norm = s => s.toLowerCase().replace(/ё/g, 'е');
+function scoreCat(text) {
+  const t = ' ' + norm(text);
+  let best = 'ideas', bestN = 0;
+  for (const [cat, kws] of Object.entries(KW)) {
+    const n = kws.filter(k => new RegExp('[^а-яa-z]' + k).test(t)).length;
+    if (n > bestN) { bestN = n; best = cat; }
+  }
+  return { cat: best, sure: bestN > 0 };
+}
+const FILLER = /^(?:бы|мне|нам|наконец|обязательно|еще|ещё|уже|срочно|сегодня|завтра|вот|тоже|просто|точно)\s+/i;
+function extractTasks(text) {
+  const out = [], seen = new Set();
+  for (const s of text.split(/[.!?;\n]+/)) {
+    const re = /(?:^|[^а-яё])(не забыть|надо|нужно|сделать|сделай)\s+/gi;
+    let m;
+    while ((m = re.exec(s))) {
+      const kw = m[1].toLowerCase();
+      const rest = s.slice(m.index + m[0].length).split(/,|\s(?:а|но|потому что|чтобы|если|пока)\s/)[0];
+      rest.split(/\s+и\s+(?=[а-яё]+(?:ть|ться|чь)(?:\s|$))/i).forEach((p, i) => {
+        let x = p.trim();
+        while (FILLER.test(x)) x = x.replace(FILLER, '');
+        if (kw.startsWith('сдела') && i === 0) x = 'сделать ' + x;
+        const w = x.split(/\s+/).filter(Boolean);
+        if (!w.length || (w.length === 1 && !/(ть|ться|чь)$/i.test(w[0]))) return;
+        x = w.slice(0, 9).join(' ');
+        const k = norm(x).replace(/^сделать /, '');
+        if (seen.has(k)) return;
+        seen.add(k); out.push(cap(x));
+      });
+    }
+  }
+  return out.slice(0, 4);
+}
+function makeTitle(text) {
+  const t = text.trim().replace(/^(?:так|слушай|ну|короче|в общем|итак|вот|смотри)[,\s]+/i, '');
+  const w = t.split(/[.!?]/)[0].split(/\s+/).filter(Boolean);
+  return cap(w.slice(0, 6).join(' ').replace(/[,:;—-]+$/, '')) + (w.length > 6 ? '…' : '');
+}
+function labelOf(text, tasks) {
+  const t = norm(text);
+  if (/решил|решено|правило|больше не |теперь только/.test(t)) return 'Решение';
+  if (tasks.length) return 'Задача';
+  if (/мечт/.test(t)) return 'Мечта';
+  if (/иде[яюие]|а что если|можно было бы|придумал/.test(t)) return 'Идея';
+  return 'Мысль';
+}
+function analyze(text) {
+  const tasks = extractTasks(text), c = scoreCat(text);
+  return { cat: c.cat, sure: c.sure, tasks, label: labelOf(text, tasks), title: makeTitle(text) };
 }
 
 /* ================= ЗАПИСЬ ================= */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 let rec = null;
-function openRecord() {
-  stopBrief(); stopVoiceNote(); if (ui.screen === 'talk') talkClear();
+function micProblem(e) {
+  if (location.protocol === 'file:') return 'Браузер не даёт микрофон странице, открытой из файла. Открой Lila по ссылке https:// или через локальный сервер.';
+  if (!window.isSecureContext) return 'Микрофон работает только по защищённой ссылке https://.';
+  if (!navigator.mediaDevices || !window.MediaRecorder) return 'Этот браузер не умеет записывать звук. Попробуй Safari или Chrome.';
+  if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) return 'Доступ к микрофону запрещён. Разреши его в настройках браузера и попробуй снова.';
+  if (e && e.name === 'NotFoundError') return 'Микрофон не найден. Подключи его и попробуй снова.';
+  return 'Не получилось включить микрофон' + (e && e.message ? `: ${e.message}` : '.');
+}
+const newRec = extra => Object.assign({ phase: 'init', sec: 0, timers: [], final: '', interim: '', cat: 'ideas', label: 'Мысль', title: '', tasks: [], tagList: [], text: '' }, extra);
+function showRecOverlay() { const o = $('#rec'); o.classList.remove('closing'); o.classList.add('open'); }
+async function openRecord() {
+  stopBrief(); stopVoiceNote(); if (ui.screen === 'talk') talkClear(); hush();
   closeSheet();
+  const r = rec = newRec({ real: true });
+  showRecOverlay(); renderRec();
+  try {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) throw null;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    if (rec !== r) { stream.getTracks().forEach(t => t.stop()); return; }
+    startReal(stream);
+  } catch (e) {
+    if (rec !== r) return;
+    r.phase = 'nomic'; r.err = micProblem(e); renderRec();
+  }
+}
+function startReal(stream) {
+  const r = rec;
+  r.stream = stream; r.phase = 'rec'; r.chunks = [];
+  const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm', 'audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(m)) || '';
+  r.mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+  r.mr.ondataavailable = e => { if (e.data && e.data.size) r.chunks.push(e.data); };
+  r.mr.start(1000);
+  renderRec();
+  // сфера реагирует на громкость голоса
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    r.ac = new AC();
+    const an = r.ac.createAnalyser(); an.fftSize = 512;
+    r.ac.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize);
+    const loop = () => {
+      if (rec !== r || !r.ac) return;
+      an.getByteTimeDomainData(buf);
+      let m = 0; for (let i = 0; i < buf.length; i++) m = Math.max(m, Math.abs(buf[i] - 128));
+      const o = $('#rec .orb'); if (o) o.style.setProperty('--lvl', r.phase === 'rec' ? (1 + Math.min(m / 100, 1) * .22).toFixed(3) : 1);
+      r.raf = requestAnimationFrame(loop);
+    };
+    loop();
+  } catch (e) { }
+  startRecognition();
+  r.clock = setInterval(() => { if (rec === r && r.phase === 'rec') { r.sec++; const t = $('#recTime'); if (t) t.textContent = fmt(r.sec); } }, 1000);
+}
+function startRecognition() {
+  const r = rec;
+  r.srState = !SR ? 'unsupported' : !navigator.onLine ? 'offline' : 'on';
+  if (r.srState !== 'on') { updateRecText(); return; }
+  const s = new SR();
+  s.lang = 'ru-RU'; s.continuous = true; s.interimResults = true;
+  s.onresult = e => {
+    if (rec !== r) return;
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const x = e.results[i];
+      if (x.isFinal) r.final = (r.final + ' ' + x[0].transcript).trim(); else interim += x[0].transcript;
+    }
+    r.interim = interim.trim();
+    updateRecText();
+  };
+  s.onerror = e => {
+    if (rec !== r || e.error === 'no-speech' || e.error === 'aborted') return;
+    r.srState = e.error === 'network' ? 'offline' : 'unavailable';
+    updateRecText();
+  };
+  // Chrome сам останавливает распознавание через паузу — перезапускаем, пока идёт запись
+  s.onend = () => { if (rec === r && r.sr === s && r.phase === 'rec' && r.srState === 'on') { try { s.start(); } catch (e) { } } };
+  r.sr = s;
+  try { s.start(); } catch (e) { r.srState = 'unavailable'; }
+  updateRecText();
+}
+const recTranscript = r => (r.final + ' ' + r.interim).trim();
+function updateRecText() {
+  const r = rec, box = $('#recText');
+  if (!r || !box || !r.real) return;
+  const text = recTranscript(r);
+  const st2 = $('#recNote');
+  if (st2) st2.textContent = r.srState === 'offline' ? 'Нет интернета — голос сохраню, расшифрую, когда сеть появится' : r.srState === 'on' ? '' : 'Расшифровка здесь недоступна — сохраню аудио с пометкой «Ждёт разбора»';
+  if (!text) { box.innerHTML = `<span class="ph">${r.srState === 'on' ? 'Говори, я слушаю…' : 'Говори, я записываю…'}</span>`; return; }
+  if (box.querySelector('.ph')) box.innerHTML = '';
+  const words = text.split(/\s+/), spans = box.children, finalN = r.final ? r.final.split(/\s+/).length : 0;
+  for (let i = 0; i < words.length; i++) {
+    if (i < spans.length) { if (spans[i].textContent !== words[i]) spans[i].textContent = words[i]; }
+    else { const s = document.createElement('span'); s.className = 'w'; s.textContent = words[i]; box.appendChild(s); }
+  }
+  while (spans.length > words.length) box.lastChild.remove();
+  for (let i = 0; i < spans.length; i++) spans[i].classList.toggle('fresh', i >= finalN);
+  if (r.phase === 'rec' || r.phase === 'paused') liveTags(text);
+}
+function setTags(list) {
+  const r = rec, el = $('#recTags'); if (!el) return;
+  let i = 0; while (i < list.length && i < r.tagList.length && list[i] === r.tagList[i]) i++;
+  while (el.children.length > i) el.lastChild.remove();
+  list.slice(i).forEach(h => el.insertAdjacentHTML('beforeend', h));
+  r.tagList = list;
+}
+function liveTags(text) {
+  const a = analyze(text), n = text.split(/\s+/).length, list = [];
+  if (a.sure || n > 8) list.push(`<span class="tag glass" style="${cv(a.cat)}"><em>Категория</em><i class="dotc"></i>${catName(a.cat)}</span>`);
+  if (a.label !== 'Мысль') list.push(`<span class="tag glass"><em>Тип</em>${a.label}</span>`);
+  a.tasks.forEach(t => list.push(`<span class="tag glass">${I.flag}<em>Задача</em>${esc(t)}</span>`));
+  setTags(list);
+}
+function startDemo() {
+  const old = rec; if (old) { releaseMic(old); clearInterval(old.clock); }
   let i; do { i = Math.floor(Math.random() * PHRASES.length); } while (i === ui.lastPhrase && PHRASES.length > 1);
   ui.lastPhrase = i;
   const ph = PHRASES[i];
-  rec = { phase: 'rec', sec: 0, wi: 0, ph, words: ph.text.split(' '), cat: ph.cat, tasks: ph.tasks.map(t => ({ title: t, on: true })), tags: 0, timers: [] };
-  const o = $('#rec'); o.classList.remove('closing'); o.classList.add('open');
-  renderRec();
-  rec.clock = setInterval(() => { if (rec && rec.phase === 'rec') { rec.sec++; const t = $('#recTime'); if (t) t.textContent = fmt(rec.sec); } }, 1000);
-  rec.wordT = setInterval(recWord, RM ? 90 : 270);
+  const r = rec = newRec({ real: false, phase: 'rec', ph, words: ph.text.split(' '), wi: 0, demoTags: 0, cat: ph.cat, label: ph.type, title: ph.title, text: ph.text, tasks: ph.tasks.map(t => ({ title: t, on: true })) });
+  showRecOverlay(); renderRec();
+  r.clock = setInterval(() => { if (rec === r && r.phase === 'rec') { r.sec++; const t = $('#recTime'); if (t) t.textContent = fmt(r.sec); } }, 1000);
+  r.wordT = setInterval(recWord, RM ? 90 : 270);
 }
 function recWord() {
-  if (!rec || rec.phase !== 'rec' || rec.wi >= rec.words.length) return;
+  const r = rec;
+  if (!r || r.real || r.phase !== 'rec' || r.wi >= r.words.length) return;
   const box = $('#recText'); if (!box) return;
-  if (rec.wi === 0) box.innerHTML = '';
+  if (r.wi === 0) box.innerHTML = '';
   $$('.w.fresh', box).forEach((w, i, a) => { if (i < a.length - 2) w.classList.remove('fresh'); });
-  const s = document.createElement('span'); s.className = 'w fresh'; s.textContent = rec.words[rec.wi]; box.appendChild(s);
-  rec.wi++;
-  const p = rec.wi / rec.words.length;
-  const tags = $('#recTags');
-  const add = html => { tags.insertAdjacentHTML('beforeend', html); rec.tags++; };
-  if (p > .3 && rec.tags === 0) add(`<span class="tag glass" style="${cv(rec.cat)}"><em>Категория</em><i class="dotc"></i>${catName(rec.cat)}</span>`);
-  if (p > .6 && rec.tags === 1) add(`<span class="tag glass"><em>Тип</em>${esc(rec.ph.type)}</span>`);
-  if (p > .85 && rec.tags === 2) add(`<span class="tag glass">${I.flag}<em>Задача</em>${esc(rec.ph.tasks[0])}</span>`);
-  if (rec.wi >= rec.words.length) { $$('.w.fresh', box).forEach(w => w.classList.remove('fresh')); const st2 = $('#recStatus'); if (st2) st2.textContent = 'Слушаю… нажми стоп, когда закончишь'; }
+  const s = document.createElement('span'); s.className = 'w fresh'; s.textContent = r.words[r.wi]; box.appendChild(s);
+  r.wi++;
+  const p = r.wi / r.words.length, tags = $('#recTags');
+  const add = html => { tags.insertAdjacentHTML('beforeend', html); r.demoTags++; };
+  if (p > .3 && r.demoTags === 0) add(`<span class="tag glass" style="${cv(r.cat)}"><em>Категория</em><i class="dotc"></i>${catName(r.cat)}</span>`);
+  if (p > .6 && r.demoTags === 1) add(`<span class="tag glass"><em>Тип</em>${esc(r.ph.type)}</span>`);
+  if (p > .85 && r.demoTags === 2) add(`<span class="tag glass">${I.flag}<em>Задача</em>${esc(r.ph.tasks[0])}</span>`);
+  if (r.wi >= r.words.length) { $$('.w.fresh', box).forEach(w => w.classList.remove('fresh')); const n = $('#recNote'); if (n) n.textContent = 'Нажми стоп, когда закончишь'; }
 }
 function recScreen() {
+  const r = rec, live = r.real && r.phase !== 'init';
+  const status = r.phase === 'init' ? 'Подключаю микрофон…' : r.phase === 'paused' ? 'Пауза' : r.real ? 'Слушаю…' : 'Демо-запись';
   return `<div class="rec">
-    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Отменить запись">${I.x}</button><span class="status" style="height:auto"><i></i><span id="recStatus">Слушаю…</span></span><span style="width:44px"></span></div>
-    <div class="rec-time" id="recTime">${fmt(rec.sec)}</div>
-    <div class="orb-halo">${orb('listening', 190)}</div>
-    <p class="rec-text" id="recText"><span class="ph">Говори, я записываю…</span></p>
+    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Отменить запись">${I.x}</button><span class="status" style="height:auto"><i></i><span id="recStatus">${status}</span></span><span style="width:44px"></span></div>
+    <div class="rec-time" id="recTime">${fmt(r.sec)}</div>
+    <div class="orb-halo">${orb(r.phase === 'paused' ? 'paused' : live ? 'live' : 'listening', 190)}</div>
+    <p class="rec-text" id="recText"><span class="ph">${r.phase === 'init' ? 'Разреши доступ к микрофону' : 'Говори, я записываю…'}</span></p>
+    <p class="rec-note" id="recNote"></p>
     <div class="rec-tags" id="recTags"></div>
     <div class="rec-ctrl">
-      <div><button class="cbtn glass" data-act="rec-pause" id="pauseBtn" aria-label="Пауза">${I.pause}</button><small id="pauseLbl">Пауза</small></div>
-      <div><button class="cbtn stop" data-act="rec-stop" aria-label="Остановить и разобрать">${I.stop}</button><small>Стоп</small></div>
+      <div><button class="cbtn glass" data-act="rec-pause" id="pauseBtn" aria-label="Пауза" ${r.phase === 'init' ? 'disabled' : ''}>${I.pause}</button><small id="pauseLbl">Пауза</small></div>
+      <div><button class="cbtn stop" data-act="rec-stop" aria-label="Остановить и разобрать" ${r.phase === 'init' ? 'disabled' : ''}>${I.stop}</button><small>Стоп</small></div>
       <div><button class="cbtn glass" data-act="rec-cancel" aria-label="Отменить">${I.x}</button><small>Отмена</small></div>
     </div>
   </div>`;
 }
-function resultScreen() {
-  const n = rec.tasks.filter(t => t.on).length;
+function nomicScreen() {
   return `<div class="rec">
-    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Не сохранять">${I.x}</button><span class="pill glass">Запись ${fmt(Math.max(rec.sec, 1))}</span><span style="width:44px"></span></div>
+    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Закрыть">${I.x}</button><span class="status" style="height:auto">Запись</span><span style="width:44px"></span></div>
+    <div class="processing">
+      <div class="orb-halo">${orb('paused', 140)}</div>
+      <div class="serif" style="text-align:center">Микрофон недоступен</div>
+      <p class="sub" style="text-align:center;max-width:310px;margin:0">${esc(rec.err)}</p>
+      <div class="btn-row" style="width:100%"><button class="btn ghost" data-act="rec-retry">Попробовать снова</button><button class="btn primary" data-act="rec-demo">Демо-запись</button></div>
+    </div>
+  </div>`;
+}
+function resultScreen() {
+  const r = rec, n = r.tasks.filter(t => t.on).length;
+  return `<div class="rec">
+    <div class="topbar"><button class="icon-btn glass" data-act="rec-cancel" aria-label="Не сохранять">${I.x}</button><span class="pill glass">Запись ${fmt(Math.max(r.sec, 1))}</span><span style="width:44px"></span></div>
     <div class="result">
-      <p class="eyebrow">Мысль разобрана</p>
-      <h2>${esc(rec.ph.title)}</h2>
+      <p class="eyebrow">${r.pending ? 'Голос записан' : 'Мысль разобрана'}</p>
+      <h2>${esc(r.title)}</h2>
+      ${r.blob ? `<div class="vpill" style="margin-bottom:14px"><button class="play" data-act="play-note" data-id="rec" aria-label="Прослушать запись">${I.play}</button><div class="wave" data-wave="rec">${waveBars('rec' + r.sec, 40)}</div><span class="dur" data-dur="rec">${fmt(r.sec)}</span></div>` : ''}
       <section class="card glass">
         <p class="eyebrow">Категория и тип</p>
-        <div class="chiprow" id="resCat">${catChip(rec.cat)}<span class="chip">${esc(rec.ph.type)}</span></div>
-        <p class="quote">«${esc(rec.ph.text)}»</p>
+        <div class="chiprow" id="resCat">${catChip(r.cat)}<span class="chip">${esc(r.label)}</span>${r.pending ? '<span class="chip pending">Ждёт разбора</span>' : ''}</div>
+        ${r.pending ? `<p class="sub" style="margin:12px 0 0">${!navigator.onLine || r.srState === 'offline' ? 'Сейчас нет интернета. Сохраню голос и расшифрую автоматически, когда сеть появится.' : r.srState === 'on' ? 'Слов не расслышала. Сохраню голос и попробую разобрать его ещё раз моделью распознавания на устройстве.' : 'Расшифровка в этом браузере недоступна. Сохраню голос и разберу его моделью распознавания на устройстве.'}</p>` : `<p class="quote">«${esc(r.text)}»</p>`}
       </section>
-      <section class="card glass">
-        <div class="brief-head" style="margin:0"><p class="eyebrow" style="margin:0">Нашла ${rec.tasks.length} ${plural(rec.tasks.length, ['задачу', 'задачи', 'задач'])}</p><span class="counter">в План: ${n}</span></div>
-        ${rec.tasks.map((t, i) => `<button class="task ${t.on ? 'done' : ''}" data-act="rec-task" data-i="${i}" aria-pressed="${t.on}" style="text-decoration:none"><span class="box">${I.check}</span><span class="t" style="color:var(--ink);text-decoration:none">${esc(t.title)}<span class="meta">${t.on ? 'добавлю в План на сегодня' : 'не добавлять'}</span></span></button>`).join('')}
-      </section>
+      ${r.pending ? '' : `<section class="card glass">
+        <div class="brief-head" style="margin:0"><p class="eyebrow" style="margin:0">${r.tasks.length ? `Нашла ${r.tasks.length} ${plural(r.tasks.length, ['задачу', 'задачи', 'задач'])}` : 'Задач не нашла'}</p>${r.tasks.length ? `<span class="counter">в План: ${n}</span>` : ''}</div>
+        ${r.tasks.length ? r.tasks.map((t, i) => `<button class="task ${t.on ? 'done' : ''}" data-act="rec-task" data-i="${i}" aria-pressed="${t.on}"><span class="box">${I.check}</span><span class="t" style="color:var(--ink);text-decoration:none">${esc(t.title)}<span class="meta">${t.on ? 'добавлю в План на сегодня' : 'не добавлять'}</span></span></button>`).join('') : '<p class="sub" style="margin:8px 0 0">Скажи «надо», «нужно», «сделать» или «не забыть» — и я вытащу задачу.</p>'}
+      </section>`}
       <div class="btn-row"><button class="btn primary" data-act="rec-save">${I.checkIco}Сохранить</button><button class="btn ghost" data-act="rec-cat">Изменить категорию</button></div>
     </div>
   </div>`;
 }
 function renderRec() {
-  const o = $('#rec');
-  if (rec.phase === 'rec' || rec.phase === 'paused') o.innerHTML = recScreen();
-  else if (rec.phase === 'processing') o.innerHTML = `<div class="rec"><div class="processing">
+  const o = $('#rec'), r = rec;
+  if (r.phase === 'init' || r.phase === 'rec' || r.phase === 'paused') o.innerHTML = recScreen();
+  else if (r.phase === 'nomic') o.innerHTML = nomicScreen();
+  else if (r.phase === 'processing') o.innerHTML = `<div class="rec"><div class="processing">
       <div class="orb-halo">${orb('thinking', 150)}</div>
       <div class="serif">Разбираю мысль…</div>
       <div class="steps"><div id="s1">${I.check}Расшифровка</div><div id="s2">${I.check}Категория</div><div id="s3">${I.check}Задачи и сроки</div></div>
@@ -1141,42 +1389,170 @@ function renderRec() {
   else o.innerHTML = resultScreen();
 }
 function recPause() {
-  if (rec.phase === 'rec') {
-    rec.phase = 'paused';
+  const r = rec;
+  if (r.phase === 'rec') {
+    r.phase = 'paused';
+    if (r.mr && r.mr.state === 'recording') try { r.mr.pause(); } catch (e) { }
+    if (r.sr) try { r.sr.stop(); } catch (e) { }
     $('#rec .orb').className = 'orb paused';
     $('#pauseBtn').innerHTML = I.mic; $('#pauseBtn').setAttribute('aria-label', 'Продолжить'); $('#pauseLbl').textContent = 'Дальше';
     $('#recStatus').textContent = 'Пауза';
-  } else if (rec.phase === 'paused') {
-    rec.phase = 'rec';
-    $('#rec .orb').className = 'orb listening';
+  } else if (r.phase === 'paused') {
+    r.phase = 'rec';
+    if (r.mr && r.mr.state === 'paused') try { r.mr.resume(); } catch (e) { }
+    if (r.sr && r.srState === 'on') try { r.sr.start(); } catch (e) { }
+    $('#rec .orb').className = 'orb ' + (r.real ? 'live' : 'listening');
     $('#pauseBtn').innerHTML = I.pause; $('#pauseBtn').setAttribute('aria-label', 'Пауза'); $('#pauseLbl').textContent = 'Пауза';
-    $('#recStatus').textContent = 'Слушаю…';
+    $('#recStatus').textContent = r.real ? 'Слушаю…' : 'Демо-запись';
   }
 }
+function releaseMic(r) {
+  if (!r) return;
+  cancelAnimationFrame(r.raf);
+  try { if (r.sr) { r.sr.onend = null; r.sr.abort ? r.sr.abort() : r.sr.stop(); } } catch (e) { }
+  try { if (r.mr && r.mr.state !== 'inactive') r.mr.stop(); } catch (e) { }
+  try { if (r.stream) r.stream.getTracks().forEach(t => t.stop()); } catch (e) { }
+  try { if (r.ac) r.ac.close(); } catch (e) { }
+  r.ac = null;
+}
 function recStop() {
-  clearInterval(rec.clock); clearInterval(rec.wordT);
-  rec.phase = 'processing'; renderRec();
   const r = rec;
+  clearInterval(r.clock); clearInterval(r.wordT);
+  r.phase = 'processing'; renderRec();
   [[500, 's1'], [1100, 's2'], [1700, 's3']].forEach(([ms, id]) => r.timers.push(setTimeout(() => { const e = $('#' + id); if (e) e.classList.add('ok'); }, ms)));
-  r.timers.push(setTimeout(() => { if (rec === r) { rec.phase = 'result'; renderRec(); } }, 2100));
+  const minWait = new Promise(res => r.timers.push(setTimeout(res, 2100)));
+  let ready = Promise.resolve();
+  if (r.real) {
+    if (r.sr) try { r.sr.stop(); } catch (e) { }   // дослушиваем последние слова
+    ready = new Promise(res => {
+      if (!r.mr || r.mr.state === 'inactive') return res();
+      r.mr.onstop = () => res();
+      try { r.mr.stop(); } catch (e) { res(); }
+    }).then(() => {
+      r.blob = r.chunks.length ? new Blob(r.chunks, { type: (r.mr && r.mr.mimeType) || r.chunks[0].type || 'audio/webm' }) : null;
+      cancelAnimationFrame(r.raf);
+      try { r.stream.getTracks().forEach(t => t.stop()); } catch (e) { }
+      try { r.ac && r.ac.close(); } catch (e) { } r.ac = null;
+    });
+  }
+  Promise.all([minWait, ready]).then(() => {
+    if (rec !== r) return;
+    if (r.real) {
+      if (r.sr) { r.sr.onresult = null; r.sr.onend = null; }
+      const text = recTranscript(r);
+      r.text = text;
+      if (text) { const a = analyze(text); Object.assign(r, { cat: a.cat, label: a.label, title: a.title, tasks: a.tasks.map(t => ({ title: t, on: true })), pending: false }); }
+      else Object.assign(r, { pending: true, cat: 'ideas', label: 'Голосовая', title: 'Голосовая заметка', tasks: [] });
+    }
+    r.suggested = r.cat;
+    r.phase = 'result'; renderRec();
+  });
 }
 function closeRecord() {
   if (!rec) return;
-  clearInterval(rec.clock); clearInterval(rec.wordT); rec.timers.forEach(clearTimeout);
+  const r = rec;
+  clearInterval(r.clock); clearInterval(r.wordT); r.timers.forEach(clearTimeout);
+  releaseMic(r);
+  if (vn.id === 'rec') stopVoiceNote();
   rec = null;
   const o = $('#rec'); o.classList.add('closing');
-  setTimeout(() => { o.classList.remove('open', 'closing'); o.innerHTML = ''; }, RM ? 0 : 340);
+  setTimeout(() => { if (!rec) { o.classList.remove('open', 'closing'); o.innerHTML = ''; } }, RM ? 0 : 340);
 }
-function recSave() {
-  const id = 'n' + uid();
-  st.notes.unshift({ id, cat: rec.cat, type: 'voice', dur: Math.max(rec.sec, 4), created: Date.now(), title: rec.ph.title, text: rec.ph.text });
-  const added = rec.tasks.filter(t => t.on);
-  added.forEach(t => st.tasks.push({ id: uid(), title: t.title, cat: rec.cat, date: todayIso(), done: false, focus: false, noteId: id }));
+async function recSave() {
+  const r = rec, id = 'n' + uid();
+  const note = { id, cat: r.cat, type: 'voice', dur: Math.max(r.sec, 1), created: Date.now(), title: r.title, text: r.text || '', label: r.label };
+  if (r.real && r.blob && r.blob.size) {
+    try { await DB.put('audio', id, r.blob); note.audio = true; note.mime = r.blob.type; }
+    catch (e) { toast('Не получилось сохранить аудио — сохраняю только текст'); }
+  }
+  if (r.pending) note.pending = true;
+  if (rec !== r) return;
+  st.notes.unshift(note);
+  const added = r.tasks.filter(t => t.on);
+  added.forEach(t => st.tasks.push({ id: uid(), title: t.title, cat: r.cat, date: todayIso(), done: false, focus: false, noteId: id }));
   save();
   closeRecord();
   ui.filter = 'all'; ui.q = ''; ui.fresh = id;
   if (ui.screen === 'thoughts') render(true); else go('thoughts');
-  toast(`Сохранено в «Мысли»${added.length ? ` · ${added.length} ${plural(added.length, ['задача', 'задачи', 'задач'])} в Плане` : ''}`, { label: 'В План', fn: () => { ui.planDay = todayWd(); go('plan'); } });
+  if (note.pending && !note.audio) { note.pending = false; note.text = 'Аудио не сохранилось, расшифровать нечего.'; save(); }
+  if (note.pending) { toast(navigator.onLine ? 'Сохранено. Разбираю запись…' : 'Сохранено. Ждёт разбора — расшифрую, когда появится сеть'); processPending(); return; }
+  toast(`Сохранено в «Мысли»${added.length ? ` · ${added.length} ${plural(added.length, ['задача', 'задачи', 'задач'])} в Плане` : ''}`, added.length ? { label: 'В План', fn: () => { ui.planDay = todayWd(); go('plan'); } } : null);
+}
+
+/* ================= ОТЛОЖЕННЫЙ РАЗБОР ================= */
+// Web Speech умеет слушать только живой микрофон, а не готовый файл.
+// Поэтому записи «Ждёт разбора» расшифровывает Whisper прямо в браузере (transformers.js):
+// модель скачивается один раз, когда есть интернет, дальше берётся из кэша.
+const ASR_LIB = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.6/dist/transformers.min.js';
+const ASR_MODEL = 'Xenova/whisper-base';
+let asrP = null, pendingBusy = false;
+const asrFiles = {};
+function loadAsr() {
+  if (!asrP) asrP = import(ASR_LIB).then(T => {
+    T.env.allowLocalModels = false;
+    return T.pipeline('automatic-speech-recognition', ASR_MODEL, {
+      progress_callback: p => {
+        if (p.status !== 'progress' || !p.total) return;
+        asrFiles[p.file] = [p.loaded, p.total];
+        const v = Object.values(asrFiles), pct = Math.round(v.reduce((a, x) => a + x[0], 0) / v.reduce((a, x) => a + x[1], 0) * 100);
+        setPendingStatus(`Загружаю распознавание… ${pct}%`);
+      },
+    });
+  }).catch(e => { asrP = null; throw e; });
+  return asrP;
+}
+async function to16k(blob) {
+  const AC = window.AudioContext || window.webkitAudioContext, ac = new AC();
+  const ab = await blob.arrayBuffer();
+  const buf = await new Promise((res, rej) => { const p = ac.decodeAudioData(ab, res, rej); if (p && p.then) p.then(res, rej); });
+  try { ac.close(); } catch (e) { }
+  const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  const oc = new OAC(1, Math.max(1, Math.ceil(buf.duration * 16000)), 16000);
+  const src = oc.createBufferSource(); src.buffer = buf; src.connect(oc.destination); src.start();
+  return (await oc.startRendering()).getChannelData(0);
+}
+function setPendingStatus(text) {
+  ui.pendingStatus = text;
+  $$('[data-pstatus]').forEach(el => { el.textContent = text || 'Ждёт разбора'; });
+}
+function applyText(n, text) {
+  n.pending = false;
+  if (!text) { n.text = 'В этой записи не расслышала слов.'; n.label = 'Голосовая'; return; }
+  const a = analyze(text);
+  Object.assign(n, { text, title: a.title, cat: a.cat, label: a.label });
+  a.tasks.forEach(t => st.tasks.push({ id: uid(), title: t, cat: a.cat, date: todayIso(), done: false, focus: false, noteId: n.id }));
+}
+function refreshAfterData() {
+  if (ui.sheet === 'note') noteSheet(ui.sheetNote);
+  if (ui.screen !== 'talk') render(false);
+}
+async function processPending(manual) {
+  const list = st.notes.filter(n => n.pending && n.audio);
+  if (!list.length || pendingBusy) return;
+  if (!navigator.onLine && !asrP) { if (manual) toast('Нет интернета — разберу, когда сеть появится'); return; }
+  pendingBusy = true;
+  setPendingStatus('Подключаю распознавание…');
+  let done = 0;
+  try {
+    const asr = await loadAsr();
+    for (const n of list) {
+      if (!st.notes.includes(n)) continue;
+      setPendingStatus('Расшифровываю…');
+      const blob = await DB.get('audio', n.id);
+      if (!blob) { n.pending = false; n.text = 'Аудио не найдено.'; continue; }
+      const out = await asr(await to16k(blob), { language: 'russian', task: 'transcribe', chunk_length_s: 30, stride_length_s: 5 });
+      applyText(n, (out && out.text || '').trim());
+      done++; save();
+    }
+    if (done) toast(`Разобрала ${done} ${plural(done, ['запись', 'записи', 'записей'])}`);
+  } catch (e) {
+    console.warn('Lila: отложенный разбор не удался', e);
+    if (manual || !ui.asrWarned) toast('Не получилось разобрать запись — попробую позже');
+    ui.asrWarned = true;
+  } finally {
+    pendingBusy = false; ui.pendingStatus = null;
+    refreshAfterData();
+  }
 }
 
 /* ================= ШТОРКА ================= */
@@ -1192,11 +1568,12 @@ function noteSheet(id, confirmDel) {
   const n = st.notes.find(x => x.id === id); if (!n) return closeSheet();
   ui.sheetNote = id;
   const tasks = st.tasks.filter(t => t.noteId === id);
-  const html = `<div class="sheet-head"><div class="chiprow">${catChip(n.cat)}<span class="chip">${TYPES[n.type]}</span></div><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
+  const html = `<div class="sheet-head"><div class="chiprow">${catChip(n.cat)}<span class="chip">${esc(n.label || TYPES[n.type])}</span>${n.pending ? `<span class="chip pending" data-pstatus="${n.id}">${ui.pendingStatus || 'Ждёт разбора'}</span>` : ''}</div><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
     <h2>${esc(n.title)}</h2>
-    <p class="meta">${when(n.created)}${n.type === 'voice' ? ` · голосовая, ${fmt(n.dur)}` : ''}</p>
+    <p class="meta">${when(n.created)}${n.type === 'voice' ? ` · голосовая, ${fmt(n.dur)}${n.audio ? ' · есть аудио' : ''}` : ''}</p>
     ${n.type === 'voice' ? `<div class="vpill" style="margin-top:12px"><button class="play" data-act="play-note" data-id="${n.id}" aria-label="Прослушать">${I.play}</button><div class="wave" data-wave="${n.id}">${waveBars(n.id, 44)}</div><span class="dur" data-dur="${n.id}">${fmt(n.dur)}</span></div>` : ''}
     ${n.type === 'numbers' ? `<div class="note numbers" style="min-height:0;padding:14px 0 0"><div class="big">${esc(n.big)}</div></div>` : ''}
+    ${n.pending ? `<p class="full" style="color:var(--ink2)">Голос сохранён, текста пока нет. ${navigator.onLine ? 'Можно разобрать прямо сейчас.' : 'Расшифрую автоматически, когда появится интернет.'}</p><button class="btn ghost full" data-act="transcribe">${I.spark}Разобрать сейчас</button>` : ''}
     <p class="full ${n.type === 'reflection' ? 'serif' : ''}" ${n.type === 'reflection' ? 'style="font-size:26px;line-height:1.15"' : ''}>${n.type === 'reflection' ? '«' + esc(n.text) + '»' : esc(n.text)}</p>
     <h4>Связанные задачи</h4>
     ${tasks.length ? tasks.map(t => taskRow(t, { meta: false })).join('') : '<p class="meta" style="margin:6px 0 0">Пока нет задач из этой мысли.</p>'}
@@ -1210,7 +1587,7 @@ function noteSheet(id, confirmDel) {
 }
 function catSheet() {
   openSheet(`<div class="sheet-head"><h2>Категория</h2><button class="icon-btn" data-act="close-sheet" aria-label="Закрыть">${I.x}</button></div>
-    <p class="meta" style="margin:0 0 10px">Я предложила «${catName(rec.ph.cat)}». Можно поменять.</p>
+    <p class="meta" style="margin:0 0 10px">Я предложила «${catName(rec.suggested || rec.cat)}». Можно поменять.</p>
     <div class="cat-list">${CATS.map(c => `<button class="${rec.cat === c.id ? 'on' : ''}" data-act="pick-cat" data-cat="${c.id}"><i class="dotc" style="${cv(c.id)}"></i>${c.name}${rec.cat === c.id ? I.checkIco : ''}</button>`).join('')}</div>`, 'cat');
 }
 function settingsHtml(confirmReset) {
@@ -1222,7 +1599,9 @@ function settingsHtml(confirmReset) {
   </div>
   <div class="set-row"><div><b>Озвучивать ответы</b><small>${ruVoice ? 'голосом браузера: ' + esc(ruVoice.name) : 'в этом браузере нет русского голоса — только анимация'}</small></div><button class="switch-hit" data-act="toggle-voice" role="switch" aria-checked="${st.voice}" aria-label="Озвучивать ответы"><span class="switch ${st.voice ? 'on' : ''}"></span></button></div>
   <div class="set-row"><div><b>Имя</b><small>как Lila обращается к тебе</small></div><span>Алина</span></div>
-  <div class="set-row" style="border:0"><div><b>Данные</b><small>${st.notes.length} ${plural(st.notes.length, ['мысль', 'мысли', 'мыслей'])}, ${st.tasks.length} ${plural(st.tasks.length, ['задача', 'задачи', 'задач'])} · хранятся только в этом браузере</small></div></div>
+  <div class="set-row"><div><b>Расшифровка речи</b><small>${SR ? 'Web Speech, русский (ru-RU) — нужен интернет' : 'в этом браузере нет Web Speech'}. Без сети запись ждёт разбора, потом её расшифрует Whisper на устройстве</small></div></div>
+  <div class="set-row"><div><b>Работа без интернета</b><small>${ui.swReady ? 'включена — Lila откроется и без сети' : location.protocol === 'file:' ? 'недоступна, пока Lila открыта из файла' : 'готовится — открой ещё раз при интернете'}</small></div></div>
+  <div class="set-row" style="border:0"><div><b>Данные</b><small>${st.notes.length} ${plural(st.notes.length, ['мысль', 'мысли', 'мыслей'])}, ${st.tasks.length} ${plural(st.tasks.length, ['задача', 'задачи', 'задач'])}, ${st.notes.filter(n => n.audio).length} аудио · ${ui.storage === 'idb' ? 'IndexedDB' : 'localStorage'} этого браузера</small></div></div>
   <button class="btn ghost full" data-act="reset-ask">Сбросить демо-данные</button>
   ${confirmReset ? `<div class="confirm"><p>Вернуть всё как было в начале? Новые мысли и отметки пропадут.</p><div class="btn-row" style="margin:0"><button class="btn danger" data-act="reset-yes" style="background:var(--danger);color:#fff">Сбросить</button><button class="btn ghost" data-act="reset-no">Отмена</button></div></div>` : ''}
   <p class="meta" style="text-align:center;margin-top:18px">Lila · кликабельный прототип</p>`;
@@ -1288,7 +1667,9 @@ const A = {
     const idx = st.notes.findIndex(x => x.id === el.dataset.id); if (idx < 0) return;
     stopVoiceNote();
     const [removed] = st.notes.splice(idx, 1); save(); closeSheet(); render(false);
-    toast('Мысль удалена', { label: 'Вернуть', fn: () => { st.notes.splice(idx, 0, removed); save(); render(false); } });
+    // аудио удаляем, только если не нажали «Вернуть»
+    const kill = setTimeout(() => { if (removed.audio && !st.notes.includes(removed)) DB.del('audio', removed.id).catch(() => { }); }, 6000);
+    toast('Мысль удалена', { label: 'Вернуть', fn: () => { clearTimeout(kill); st.notes.splice(idx, 0, removed); save(); render(false); } });
   },
   'pick-day': el => { ui.planDay = +el.dataset.i; render(false); },
   'toggle-goal': el => { const id = el.dataset.id; ui.openGoals.has(id) ? ui.openGoals.delete(id) : ui.openGoals.add(id); render(false); },
@@ -1319,10 +1700,13 @@ const A = {
   'rec-pause': () => recPause(),
   'rec-stop': () => recStop(),
   'rec-cancel': () => { const wasResult = rec && rec.phase === 'result'; closeRecord(); toast(wasResult ? 'Мысль не сохранена' : 'Запись отменена'); },
-  'rec-task': el => { const t = rec.tasks[+el.dataset.i]; t.on = !t.on; renderRec(); },
+  'rec-task': el => { const t = rec.tasks[+el.dataset.i]; t.on = !t.on; stopVoiceNote(); renderRec(); },
   'rec-cat': () => catSheet(),
-  'pick-cat': el => { rec.cat = el.dataset.cat; closeSheet(); renderRec(); toast(`Категория: ${catName(rec.cat)}`); },
+  'pick-cat': el => { rec.cat = el.dataset.cat; closeSheet(); stopVoiceNote(); renderRec(); toast(`Категория: ${catName(rec.cat)}`); },
   'rec-save': () => recSave(),
+  'rec-retry': () => { closeRecord(); setTimeout(openRecord, RM ? 0 : 360); },
+  'rec-demo': () => startDemo(),
+  'transcribe': () => processPending(true),
   'theme': el => { st.theme = el.dataset.theme; save(); applyTheme(); $('#sheetBody').innerHTML = settingsHtml(); },
   'toggle-voice': () => { st.voice = !st.voice; save(); if (!st.voice) hush(); $('#sheetBody').innerHTML = settingsHtml(); },
   'reset-ask': () => { $('#sheetBody').innerHTML = settingsHtml(true); const s = $('.sheet'); s.scrollTo({ top: s.scrollHeight, behavior: 'smooth' }); },
@@ -1331,6 +1715,7 @@ const A = {
     stopBrief(); stopVoiceNote(); talkLeave();
     const theme = st.theme;
     try { localStorage.removeItem(KEY); } catch (e) { }
+    DB.clear('audio').catch(() => { });
     st = seed(); st.theme = theme; save();
     Object.assign(ui, { screen: 'today', filter: 'all', q: '', planDay: todayWd(), fresh: null, goalPrev: {} }); ui.openGoals.clear();
     closeSheet(); render(true); toast('Демо-данные восстановлены');
@@ -1377,10 +1762,18 @@ function clock() { const n = new Date(); $('#sbTime').textContent = `${n.getHour
 addEventListener('resize', fit);
 
 /* ================= СТАРТ ================= */
-load();
-applyTheme();
-fit(); clock(); setInterval(clock, 20000);
-render(true);
+addEventListener('online', () => processPending());
+addEventListener('offline', () => toast('Нет сети — всё работает, записи разберу позже'));
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => { ui.swReady = true; }).catch(() => { });
+}
+(async () => {
+  await load();
+  applyTheme();
+  fit(); clock(); setInterval(clock, 20000);
+  render(true);
+  processPending();
+})();
 </script>
 </body>
 </html>
